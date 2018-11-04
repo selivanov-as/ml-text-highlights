@@ -1,7 +1,8 @@
 const highlight = `
-    var words = [];
-
-    var walkDOM = function (node, func) {
+    const random = () => Math.floor(Math.random()*2);
+    const regex = /[^а-яa-z0-9]/gi;
+    
+    const walkDOM = (node, func) => {
         func(node);
         node = node.firstChild;
         while(node) {
@@ -11,47 +12,20 @@ const highlight = `
     
     };
     
-    walkDOM(document.body, function (node) {
-    
-        if (node.nodeName === '#text') {
-            var text = node.textContent;
-    
-            text = text.replace(/[^A-Za-z]/g, ' ');
-    
-            text = text.split(' ');
-    
-            if (text.length) {
-    
-                for (var i = 0, length = text.length; i < length; i += 1) {
-                    var matched = false,
-                        word = text[i];
-    
-                    for (var j = 0, numberOfWords = words.length; j < numberOfWords; j += 1) {
-                        if (words[j][0] === word) {
-                            matched = true;
-                            words[j][1] += 1;
-                        }
-                    }
-    
-                    if (!matched) {
-                        words.push([word, 1]);
-                    }
-    
-                }
-            }
-        }
-    });
-    
-    //code from https://stackoverflow.com/a/14105425/8048608
-    
-    var context = document.querySelector("body");
-    var instance = new Mark(context);
-    
-    const random = () => Math.floor(Math.random()*2)
-    
-    for (var i = 0, length = words.length; i < length; i += 1) {
-        random() % 2 === 0 ? instance.mark(words[i][0]) : null;
+    const highlightFunc = (node) => {
+        if (node.nodeName !== '#text') return;
+        
+        var text = node.textContent;
+        text = text.replace(regex, ' ');
+        text = text.split(' ');
+
+        if (!text.length) return; 
+        
+        const instance = new Mark(node);
+        random() % 2 === 0 ? instance.mark(text, node) : null;   
     }
+    
+    walkDOM(document.body, highlightFunc);
 `;
 
 chrome.browserAction.onClicked.addListener(function (tab) {
