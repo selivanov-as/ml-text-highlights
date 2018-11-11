@@ -16,6 +16,10 @@
     {
       "js": ["mark.min.js"],
       "matches": ["<all_urls>"]
+    },
+    {
+      "js": ["idf.js"],
+      "matches": ["<all_urls>"]
     }
   ]
 }
