@@ -1,0 +1,19 @@
+{
+  "name": "ml-text-highlights",
+  "version": "1.0.0",
+  "description": "* Цель \t* Ускорить взаимодействие с письмами пользователя * Техническая цель \t* Плагин, выделяющий важное в тексте * Успех \t* Появится плагин в Chromium в marketplace, со 100 пользователями, который умеет выделять важдное в тексте письма с хорошей метрикой качества (PR/AC/Recall/?) за 1 с (300мс) к 25.04.2019 и соблюдением GDPR * Метрики \t* latency \t* PR/AC/Recall/? \t* Рейтинг в marketplace \t* Количество пользователей",
+  "main": "index.js",
+  "scripts": {
+    "create_idf": "node idf/count_idf.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/selivanov-as/ml-text-highlights.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/selivanov-as/ml-text-highlights/issues"
+  },
+  "homepage": "https://github.com/selivanov-as/ml-text-highlights#readme"
+}
