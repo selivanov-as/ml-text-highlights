@@ -11,7 +11,6 @@ const highlight = `
             walkDOM(node, func);
             node = node.nextSibling;
         }
-    
     };
     
     const highlightFunc = (node) => {
@@ -52,5 +51,5 @@ const highlight = `
 
 chrome.browserAction.onClicked.addListener(function (tab) {
     console.log("Click event");
-    chrome.tabs.executeScript({code: highlight}, (res) => console.log);
+    chrome.tabs.executeScript({code: highlight}, (res) => console.log); //ToDo: Reuse code from Hightlight.js
 });
