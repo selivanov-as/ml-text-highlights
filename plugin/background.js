@@ -50,7 +50,13 @@ const highlight = `
     
 `;
 
+const makeHTTPRequest = `
+    axios.get('http://localhost:3000/').then(function(response) {
+        console.log("response", response);
+    });
+`;
+
 chrome.browserAction.onClicked.addListener(function (tab) {
     console.log("Click event");
-    chrome.tabs.executeScript({code: highlight}, (res) => console.log);
+    chrome.tabs.executeScript({code: makeHTTPRequest}, (res) => console.log); //ToDo: Reuse code from Hightlight.js
 });
