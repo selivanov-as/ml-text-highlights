@@ -4,7 +4,9 @@
   "name": "Highlights",
   "description": "Highlights random words on page",
   "permissions": [
-    "activeTab"
+    "activeTab",
+    "https://*/",
+    "http://*/"
   ],
   "background": {
     "scripts": [
@@ -14,7 +16,11 @@
   "browser_action": {}, // workaround described here: https://stackoverflow.com/a/38338182/8048608
   "content_scripts": [
     {
-      "js": ["mark.min.js"],
+      "js": ["./vendors/mark.min.js"],
+      "matches": ["<all_urls>"]
+    },
+    {
+      "js": ["./vendors/axios.min.js"],
       "matches": ["<all_urls>"]
     },
     {
