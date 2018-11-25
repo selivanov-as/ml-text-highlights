@@ -1,6 +1,5 @@
 const highlight = `
-    const random = () => Math.floor(Math.random()*2);
-    const regex = /[^аАбБвВгГдДеЕёЁжЖзЗиИйЙкКлЛмМнНоОпПрРсСтТуУфФхХцЦчЧшШщЩъЪыЫьЬэЭюЮяЯ0-9]/gi;
+    const regex = /[^a-яё0-9]/gi;
     const tf = {};
     let wordsAmount = 0;
     
@@ -39,7 +38,7 @@ const highlight = `
     const instance = new Mark(document);
     Object.keys(tf).forEach(term => {
         const term_idf = idf[term] ? idf[term] : 0;
-        const tf_idf = tf[term][0] / wordsAmount * term_idf * multiplier;
+        const tf_idf = (tf[term][0] / wordsAmount * multiplier) / term_idf;
         if (tf_idf >= 0.3) {
             tf[term][1].forEach(context => instance.mark(term, {accuracy: "exactly"}))
         }
