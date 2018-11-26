@@ -13,7 +13,7 @@ lines.forEach(line => {
     const [tf, word] = line.split("\t");
     if (!word || !tf) return;
 
-    idf[word.toLowerCase()] = 1 / tf;
+    idf[word.toLowerCase()] = tf;
 });
 
 console.log("Parsing finished!");
