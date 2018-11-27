@@ -1,0 +1,1 @@
+to start server run start_server.sh

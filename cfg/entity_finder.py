@@ -1,18 +1,14 @@
 import sys
 from natasha import (
     NamesExtractor,
-    PersonExtractor,
-
-    LocationExtractor,
+    #PersonExtractor,
+    #LocationExtractor,
     AddressExtractor,
-
-    OrganisationExtractor,
-
+    #OrganisationExtractor,
     DatesExtractor,
-
-    MoneyExtractor,
-    MoneyRateExtractor,
-    MoneyRangeExtractor,
+    #MoneyExtractor,
+    #MoneyRateExtractor,
+    #MoneyRangeExtractor,
 )
 from yargy.token import Span
 
@@ -41,14 +37,14 @@ def find_entities(text):
     all_spans = []
     for extr_cls in (
         NamesExtractor,
-        PersonExtractor,
-        LocationExtractor,
+        #PersonExtractor,
+        #LocationExtractor,
         AddressExtractor,
-        OrganisationExtractor,
+        #OrganisationExtractor,
         DatesExtractor,
-        MoneyExtractor,
-        MoneyRateExtractor,
-        MoneyRangeExtractor,
+        #MoneyExtractor,
+        #MoneyRateExtractor,
+        #MoneyRangeExtractor,
     ):
         extractor = extr_cls()
         matches = extractor(text)
