@@ -16,5 +16,5 @@ def work_with_cfg():
 		for text in texts:
 			spans.append(find_entities(text))
 		assert len(texts) == len(spans), f'length of texts is{len(texts)} while length of spans is {len(spans)}'
-		print(spans)
+		#print(spans)
 		return json.dumps(spans)
