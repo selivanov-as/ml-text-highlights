@@ -17,5 +17,5 @@ lines.forEach(line => {
 });
 
 console.log("Parsing finished!");
-fs.writeFileSync(path.join(__dirname, "../plugin/idf.js"), "const idf = " + JSON.stringify(idf), "utf-8");
+fs.writeFileSync(path.join(__dirname, "../plugin/idf.json"), JSON.stringify(idf), "utf-8");
 console.log("Idf was saved to json file");
