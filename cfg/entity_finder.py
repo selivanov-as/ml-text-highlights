@@ -10,7 +10,6 @@ from natasha import (
     #MoneyRateExtractor,
     #MoneyRangeExtractor,
 )
-from yargy.token import Span
 
 
 def unite_spans(spans):
@@ -27,9 +26,9 @@ def unite_spans(spans):
         elif span.stop <= end:
             continue
         else:
-            new_spans.append(Span(beg, end))
+            new_spans.append((beg, end))
             beg, end = span.start, span.stop
-    new_spans.append(Span(beg, end))
+    new_spans.append((beg, end))
     return new_spans
 
 

@@ -1,3 +1,7 @@
+const server_addr = 'http://127.0.0.1:5000/cfg';
+const rus_or_dig = /[а-яё0-9]/i;
+const ignored_tags = new Set(["SCRIPT", "STYLE"]);
+
 var text_nodes = [];
 function dfs(node) {
     for (var child = node.firstChild; child; child=child.nextSibling) {
@@ -15,11 +19,11 @@ var good_nodes = [];
 for (node of text_nodes) {
     parent = node.parentNode;
     parent_tag = parent.nodeName;
-    if (parent_tag == "SCRIPT" || parent_tag == "STYLE") {
+    if (ignored_tags.has(parent_tag)) {
         continue;
     }
     var text = node.innerText || node.textContent;
-    if (text.search(/[а-я0-9]/gi) < 0) {
+    if (text.search(rus_or_dig) == -1) {
         continue;
     }
 	good_nodes.push(node);
@@ -27,11 +31,9 @@ for (node of text_nodes) {
 }
 
 spans = [];
-spans = axios.post('http://127.0.0.1:5000/cfg', texts).then(
+spans = axios.post(server_addr, texts).then(
 	function (response) {
 		spans = response.data;
-		//console.log(spans);
-		//console.log(good_nodes.length, texts.length, spans.length);
 		
 		for (var i = 0; i < good_nodes.length; i++) {
 			node = good_nodes[i];
