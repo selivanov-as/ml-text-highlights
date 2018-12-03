@@ -1,0 +1,17 @@
+ {
+	"name": "cfg highlighter",
+    "version": "1.0",
+    "description": "i highlight entities found with cfg",
+    "permissions": ["storage"],
+    "manifest_version": 2,
+    "content_scripts": [
+		{
+			"js": ["./vendors/axios.min.js"],
+			"matches": ["<all_urls>"]
+		},
+		{
+			"matches": ["<all_urls>"],
+			"js": ["content.js"]
+		}
+    ]
+ }
