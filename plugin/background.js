@@ -1,7 +1,8 @@
 const highlight = `
-    const regex = /[^a-яё0-9]/gi;
-    const tf = {};
-    let wordsAmount = 0;
+    var API_URL = "http://localhost:5000/tf-idf";
+    var regex = /[^a-яё0-9]/gi;
+    var tf = {};
+    var words = [];
     
     const walkDOM = (node, func) => {
         func(node);
@@ -22,37 +23,20 @@ const highlight = `
 
         if (!text.length) return; 
         
-        text.forEach(word => {
-            if (!tf[word.toLowerCase()]) {
-                tf[word.toLowerCase()] = [1, [node]];
-                wordsAmount++;
-            } else {
-                tf[word.toLowerCase()][0]++;
-                tf[word.toLowerCase()][1].push(node)
-            }
-        });
+        text.forEach(word => word.length ? words.push(word) : null);
     }
     
     walkDOM(document.body, highlightFunc);
-    const multiplier = 1000;
-    const instance = new Mark(document);
-    Object.keys(tf).forEach(term => {
-        const term_idf = idf[term] ? idf[term] : 0;
-        const tf_idf = (tf[term][0] / wordsAmount * multiplier) / term_idf;
-        if (tf_idf >= 0.3) {
-            tf[term][1].forEach(context => instance.mark(term, {accuracy: "exactly"}))
-        }
-    });
-    
-`;
-
-const makeHTTPRequest = `
-    axios.get('http://localhost:3000/').then(function(response) {
-        console.log("response", response);
+    axios.post(API_URL, words).then(result => {
+        var instance = new Mark(document);
+        console.log(result.data);
+        Object.keys(result.data).forEach(word => {
+            if (result.data[word] >= 0.25) instance.mark(word, {accuracy: "exactly", acrossElements: true});
+        }); 
     });
 `;
 
 chrome.browserAction.onClicked.addListener(function (tab) {
     console.log("Click event");
-    chrome.tabs.executeScript({code: makeHTTPRequest}, (res) => console.log); //ToDo: Reuse code from Hightlight.js
+    chrome.tabs.executeScript({code: highlight}, (res) => console.log); //ToDo: Reuse code from Hightlight.js
 });
