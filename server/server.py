@@ -5,7 +5,7 @@ import pymorphy2
 import json
 from pprint import pprint
 
-with open('../plugin/normalised_idf.json') as f:
+with open('../normalized_idf/normalized_idf.json') as f:
     normalised_idf = json.loads(f.read())
 
 morph = pymorphy2.MorphAnalyzer()
@@ -13,7 +13,7 @@ morph = pymorphy2.MorphAnalyzer()
 app = Flask(__name__)
 
 
-@app.route('/tf-idf', methods=['POST'])
+@app.route('/tf-normalized_idf', methods=['POST'])
 def handleTF_IDF():
     tf_idf = dict()
 
@@ -28,6 +28,6 @@ def handleTF_IDF():
         word_normal_form_idf = normalised_idf.get(word_normal_form)
 
         if word_normal_form_idf is not None:
-            tf_idf[words[i]] = (normalized_words.count(word) / len(words) * 10000) / word_normal_form_idf
+            tf_idf[words[i]] = (normalized_words.count(word) / len(words) * 1000) / word_normal_form_idf
 
     return json.dumps(tf_idf, ensure_ascii=False)

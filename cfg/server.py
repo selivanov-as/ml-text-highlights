@@ -27,7 +27,7 @@ app = Flask(__name__)
 #         # print(spans)
 #         return json.dumps(spans)
 
-@app.route('/tf-idf', methods=['POST'])
+@app.route('/tf-normalized_idf', methods=['POST'])
 def handleTF_IDF():
     words = json.loads(request.data)
     for word in words:
