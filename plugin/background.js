@@ -4,7 +4,7 @@ const highlight = `
     var tf = {};
     var words = [];
     
-    const walkDOM = (node, func) => {
+    var walkDOM = (node, func) => {
         func(node);
         node = node.firstChild;
         while(node) {
@@ -14,7 +14,7 @@ const highlight = `
     
     };
     
-    const highlightFunc = (node) => {
+    var highlightFunc = (node) => {
         if (node.nodeName !== '#text') return;
         
         var text = node.textContent;
@@ -32,7 +32,7 @@ const highlight = `
         console.log(result.data);
         Object.keys(result.data).forEach(word => {
             if (result.data[word] >= 0.25) instance.mark(word, {accuracy: "exactly", acrossElements: true});
-        }); 
+        });
     });
 `;
 
