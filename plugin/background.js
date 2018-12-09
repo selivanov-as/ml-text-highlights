@@ -3,6 +3,7 @@ const highlight = `
     var regex = /[^a-яё0-9]/gi;
     var tf = {};
     var words = [];
+    var punctuationSymbols = [":", ";", ".", ",", "-", "–", "—", "‒", "_", "(", ")", "{", "}", "[", "]", "!", "'", "+", "="];
     
     var walkDOM = (node, func) => {
         func(node);
@@ -28,11 +29,19 @@ const highlight = `
     
     walkDOM(document.body, highlightFunc);
     axios.post(API_URL, words).then(result => {
-        var instance = new Mark(document);
+        var instance = new Mark(document.body);
         console.log(result.data);
-        Object.keys(result.data).forEach(word => {
-            if (result.data[word] >= 0.25) instance.mark(word, {accuracy: "exactly", acrossElements: true});
+        result.data.slice(0, (result.data.length * 0.3) >> 0).forEach(elem => {
+            instance.mark(elem.word, 
+                         {"accuracy": {
+                            "value": "exactly",
+                            "limiters": [",", ".", "-", ":"]
+                         }, 
+                         acrossElements: true});
         });
+        /*Object.keys(result.data).forEach(word => {
+            if (result.data[word] >= 0.25) instance.mark(word, {accuracy: "exactly", acrossElements: true});
+        });*/
     });
 `;
 
