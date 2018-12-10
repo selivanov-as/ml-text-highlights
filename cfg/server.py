@@ -27,10 +27,10 @@ def find_in_texts(texts, dlm=' '):
     grouped_spans = []
     for (beg, end) in borders:
         start_ind = cur_ind
-        while spans[cur_ind][1] < end and cur_ind + 1 < len(spans):
+        while cur_ind < len(spans) and spans[cur_ind][1] < end:
             cur_ind += 1
         cur_spans = spans[start_ind : cur_ind]
-        if spans[cur_ind][0] < end:  # span is divided between text nodes
+        if  cur_ind < len(spans) and spans[cur_ind][0] < end:  # span is divided between text nodes
             cur_spans.append((spans[cur_ind][0], end))
         cur_spans = [tuple(max(0, x - beg) for x in span)
                             for span in cur_spans]
