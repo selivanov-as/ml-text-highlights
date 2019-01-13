@@ -1,5 +1,5 @@
 const highlight = `
-    var server_addr = 'http://127.0.0.1:5000/cfg';
+    var server_addr = 'http://127.0.0.1:5000/tf-idf';
     var rus_or_dig = /[а-яё0-9]/i;
     var ignored_tags = new Set(["SCRIPT", "STYLE"]);
 
@@ -57,10 +57,6 @@ const highlight = `
                         }
                         marked_node = document.createElement("mark");
                         marked_node.textContent = texts[i]['text'].slice(span[0], span[1]);
-                        console.log(texts[i]['text']); //
-                        console.log(span);
-                        console.log(texts[i]['text'].slice(span[0], span[1]));
-                        console.log(marked_node); //
                         parent.insertBefore(marked_node, last_node);
                         last_pos = span[1];
                     }

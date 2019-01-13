@@ -1,11 +1,18 @@
 import json
-import time
-from entity_finder import find_entities
-from flask import Flask, request
-import pymorphy2
-import json
-from pprint import pprint
 import operator
+import string
+import time
+from pprint import pprint
+
+import pymorphy2
+from flask import Flask, request
+
+from entity_finder import find_entities
+
+
+THR = 0.25
+SHARE = 0.3
+PUNCTUATION = string.punctuation + "–—‒"
 
 with open('../normalized_idf/normalized_idf.json') as f:
     normalised_idf = json.loads(f.read())
@@ -22,7 +29,7 @@ morph = pymorphy2.MorphAnalyzer()
 app = Flask(__name__)
 
 
-def find_in_texts(texts, dlm=' '):
+def find_with_cfg_in_texts(texts, dlm=' '):
     joined = dlm.join(texts)
     borders = []
     end = -len(dlm)
@@ -41,7 +48,6 @@ def find_in_texts(texts, dlm=' '):
     
     cur_ind = 0
     grouped_spans = []
-    
     
     for (beg, end) in borders:
         start_ind = cur_ind
@@ -63,15 +69,45 @@ def work_with_cfg():
     #begin = time.perf_counter()
     input = json.loads(request.data)
     texts = [x['text'] for x in input]
-    spans = find_in_texts(texts)
+    spans = find_with_cfg_in_texts(texts)
     #overall_time = time.perf_counter() - begin
     #print(f'overall time: {overall_time} s')
     return json.dumps(spans)
 
 
+def input_to_words(input):
+    texts = [x['text'] for x in input]
+    return [word for word in
+                (token.strip(PUNCTUATION)
+                 for text in texts
+                 for token in text.split())
+                if word]  # shoul we strip?
+
+
+def sorted_tfidfs_to_spans(sorted_tfidfs, input):
+    n_important = int(len(sorted_tfidfs) * SHARE)
+    important_words = {tf_idf_info['word'] for tf_idf_info in sorted_tfidfs[:n_important]}
+    
+    grouped_spans = []
+    for node in input:
+        cur_pos = 0
+        text = node['text']
+        cur_spans = []
+        for word in text.split():
+            if word.strip(PUNCTUATION) in important_words:
+                beg = text.find(word, cur_pos)
+                cur_pos = end = beg + len(word)
+                cur_spans.append((beg, end))
+            else:
+                cur_pos += len(word) + 1
+        grouped_spans.append(cur_spans)
+    return grouped_spans
+
+
 @app.route('/tf-idf', methods=['POST'])
 def handleTF_IDF():
-    words = json.loads(request.data)
+    input = json.loads(request.data)
+    words = input_to_words(input)
     normalized_words = []
     results = []
     included_normal_forms = {}
@@ -111,4 +147,6 @@ def handleTF_IDF():
             results.append(tf_idf_info)
             included_normal_forms[word_normal_form] = True
 
-    return json.dumps(sorted(results, key=operator.itemgetter('tf_idf'), reverse=True), ensure_ascii=False)
+    sorted_tfidfs = sorted(results, key=operator.itemgetter('tf_idf'), reverse=True)
+
+    return json.dumps(sorted_tfidfs_to_spans(sorted_tfidfs, input))
