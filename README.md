@@ -24,3 +24,13 @@
 3. Обучиться на данных
 4. Измериться на данных
 5. Создать решающую функцию
+
+## Wikipedia Corpus
+Скачиваем последний дамп с русской википедией (занимает ~60 минут в зависимости от скорости интернета)
+`wget http://dumps.wikimedia.org/ruwiki/latest/ruwiki-latest-pages-articles.xml.bz2`
+
+Вычленяем и сохраняем все токены из корпуса в текстовый файл (занимает 3-5 часов)
+https://gist.github.com/bulgakovk/4d81cdfb12bc0edab8f0f1fa0c578bc4
+
+Лемматизация и обучение моделей с 27 страницы:
+http://www.machinelearning.ru/wiki/images/7/7e/Mel_lain_msu_nlp_sem_5.pdf
