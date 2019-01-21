@@ -1,5 +1,5 @@
 const highlight = `
-    var server_addr = 'http://127.0.0.1:5000/tf-idf';
+    var server_addr = 'http://127.0.0.1:5000/w2v';
     var rus_or_dig = /[а-яё0-9]/i;
     var ignored_tags = new Set(["SCRIPT", "STYLE"]);
 

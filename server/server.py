@@ -20,6 +20,9 @@ with open('../normalized_idf/normalized_idf.json') as f:
 with open("./stopwords.txt") as f:
     stop_words_list = f.readlines()
 
+with open("./norms_cbow_base.json") as f:
+    vector_norms = json.load(f)
+
 stop_words = {}
 for x in stop_words_list:
     stop_words[x.strip()] = True
@@ -81,13 +84,10 @@ def input_to_words(input):
                 (token.strip(PUNCTUATION)
                  for text in texts
                  for token in text.split())
-                if word]  # shoul we strip?
+                if word]
 
 
-def sorted_tfidfs_to_spans(sorted_tfidfs, input):
-    n_important = int(len(sorted_tfidfs) * SHARE)
-    important_words = {tf_idf_info['word'] for tf_idf_info in sorted_tfidfs[:n_important]}
-    
+def important_words_to_spans(important_words, input):
     grouped_spans = []
     for node in input:
         cur_pos = 0
@@ -102,6 +102,13 @@ def sorted_tfidfs_to_spans(sorted_tfidfs, input):
                 cur_pos += len(word) + 1
         grouped_spans.append(cur_spans)
     return grouped_spans
+
+
+def sorted_tfidfs_to_spans(sorted_tfidfs, input):
+    n_important = int(len(sorted_tfidfs) * SHARE)
+    important_words = {tf_idf_info['word']
+                       for tf_idf_info in sorted_tfidfs[:n_important]}
+    return important_words_to_spans(important_words, input)
 
 
 @app.route('/tf-idf', methods=['POST'])
@@ -147,6 +154,49 @@ def handleTF_IDF():
             results.append(tf_idf_info)
             included_normal_forms[word_normal_form] = True
 
-    sorted_tfidfs = sorted(results, key=operator.itemgetter('tf_idf'), reverse=True)
+    sorted_tfidfs = sorted(results, key=operator.itemgetter('tf_idf'),
+                           reverse=True)
 
     return json.dumps(sorted_tfidfs_to_spans(sorted_tfidfs, input))
+
+
+def choose_n_important(sorted_pairs, min_share=0.05, max_share=0.4):
+    if not sorted_pairs:
+        return 0
+    declines = [(prev[1] / cur[1], i)
+                for i, (prev, cur)
+                in enumerate(
+                    zip(sorted_pairs, sorted_pairs[1:]),
+                    start=1
+                )]
+    min_ind, max_ind = (int(share * len(sorted_pairs))
+                        for share in [min_share, max_share])
+    _, n_important = max(declines[min_ind : max_ind + 1])
+    return n_important
+
+
+@app.route('/w2v', methods=['POST'])
+def highlight_with_v2w_norm():
+    input = json.loads(request.data)
+    words = input_to_words(input)
+
+    no_normal = object()
+    normalized_words = [morph.parse(word)[0].normal_form or no_normal
+                        for word in words]
+    
+    norms = {normalized_word: vector_norms.get(normalized_word, 1e-6)
+             for normalized_word in normalized_words}
+
+    vector_norms_sorted = sorted(norms.items(),
+                                 key=lambda x: x[1], 
+                                 reverse=True)
+
+    n_important = choose_n_important(vector_norms_sorted)
+
+    important_normalized_words = {normalized_word for normalized_word, norm
+                                  in vector_norms_sorted[:n_important]}
+    important_words = {word for word, normalized_word
+                       in zip(words, normalized_words)
+                       if normalized_word in important_normalized_words}
+
+    return json.dumps(important_words_to_spans(important_words, input))
