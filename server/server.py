@@ -1,3 +1,4 @@
+import itertools
 import json
 import operator
 import string
@@ -8,6 +9,7 @@ import pymorphy2
 from flask import Flask, request
 
 from entity_finder import find_entities
+from rus_preprocessing_mystem import (tag_mystem, mystem2upos)
 
 
 THR = 0.25
@@ -17,7 +19,10 @@ PUNCTUATION = string.punctuation + "–—‒"
 # NORMS_FILE = './norms_cbow_base.json'
 # NORMS_FILE = './norms_glove_50k.json'
 # NORMS_FILE = './norms_sg_full.json'
-NORMS_FILE = './norms_cbow_full.json'
+# NORMS_FILE = './norms_cbow_full.json'
+# NORMS_FILE = 'norms_ruwikiruscorpora-func_upos_skipgram_300_5_2019.json'
+# NORMS_FILE = 'norms_ruwikiruscorpora_upos_skipgram_300_2_2019.json'
+NORMS_FILE = 'norms_ruscorpora_upos_cbow_300_20_2019.json'
 
 with open('../normalized_idf/normalized_idf.json') as f:
     normalised_idf = json.loads(f.read())
@@ -206,3 +211,51 @@ def highlight_with_v2w_norm():
                        if normalized_word in important_normalized_words}
 
     return json.dumps(important_words_to_spans(important_words, input))
+
+
+@app.route('/w2v_rv', methods=['POST'])
+def highlight_with_rusvectores_norm():
+    input = json.loads(request.data)
+    texts = [x['text'] for x in input]
+    tokens, normalized_tokens = [], []
+    for text in texts:
+        cur_tokens, cur_normalized_tokens = tag_mystem(
+            text, mapping=mystem2upos
+        )
+        tokens.append(cur_tokens)
+        normalized_tokens.append(cur_normalized_tokens)
+
+    norms = {normalized_token: vector_norms.get(normalized_token, 1e-6)
+             for normalized_token in itertools.chain(*normalized_tokens)}
+
+    vector_norms_sorted = sorted(norms.items(),
+                                 key=lambda x: x[1],
+                                 reverse=True)
+
+    n_important = choose_n_important(vector_norms_sorted,
+                                     min_share=0.2, max_share=0.3)
+
+    important_normalized_tokens = {normalized_word for normalized_word, norm
+                                  in vector_norms_sorted[:n_important]}
+    important_words = {token
+                       for cur_tokens, cur_normalized_tokens
+                       in zip(tokens, normalized_tokens)
+                       for token, normalized_token
+                       in zip(cur_tokens, cur_normalized_tokens)
+                       if normalized_token in important_normalized_tokens}
+
+    grouped_spans = []
+    for node, words in zip(input, tokens):
+        cur_pos = 0
+        text = node['text']
+        cur_spans = []
+        for word in words:
+            if word in important_words:
+                beg = text.find(word, cur_pos)
+                cur_pos = end = beg + len(word)
+                cur_spans.append((beg, end))
+            else:
+                cur_pos += len(word)
+        grouped_spans.append(cur_spans)
+    return json.dumps(grouped_spans)
+
