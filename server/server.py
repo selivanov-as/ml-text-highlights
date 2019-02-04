@@ -13,6 +13,11 @@ from entity_finder import find_entities
 THR = 0.25
 SHARE = 0.3
 PUNCTUATION = string.punctuation + "–—‒"
+# NORMS_FILE = './norms_sg_base.json'
+# NORMS_FILE = './norms_cbow_base.json'
+# NORMS_FILE = './norms_glove_50k.json'
+# NORMS_FILE = './norms_sg_full.json'
+NORMS_FILE = './norms_cbow_full.json'
 
 with open('../normalized_idf/normalized_idf.json') as f:
     normalised_idf = json.loads(f.read())
@@ -20,7 +25,7 @@ with open('../normalized_idf/normalized_idf.json') as f:
 with open("./stopwords.txt") as f:
     stop_words_list = f.readlines()
 
-with open("./norms_cbow_base.json") as f:
+with open(NORMS_FILE) as f:
     vector_norms = json.load(f)
 
 stop_words = {}
@@ -191,7 +196,8 @@ def highlight_with_v2w_norm():
                                  key=lambda x: x[1], 
                                  reverse=True)
 
-    n_important = choose_n_important(vector_norms_sorted)
+    n_important = choose_n_important(vector_norms_sorted,
+                                     min_share=0.2, max_share=0.3)
 
     important_normalized_words = {normalized_word for normalized_word, norm
                                   in vector_norms_sorted[:n_important]}
