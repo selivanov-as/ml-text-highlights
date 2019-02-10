@@ -1,6 +1,7 @@
 import itertools
 import json
 import operator
+import re
 import string
 import time
 from pprint import pprint
@@ -14,15 +15,20 @@ from rus_preprocessing_mystem import (tag_mystem, mystem2upos)
 
 THR = 0.25
 SHARE = 0.3
-PUNCTUATION = string.punctuation + "–—‒"
-# NORMS_FILE = './norms_sg_base.json'
-# NORMS_FILE = './norms_cbow_base.json'
-# NORMS_FILE = './norms_glove_50k.json'
-# NORMS_FILE = './norms_sg_full.json'
-# NORMS_FILE = './norms_cbow_full.json'
-# NORMS_FILE = 'norms_ruwikiruscorpora-func_upos_skipgram_300_5_2019.json'
-# NORMS_FILE = 'norms_ruwikiruscorpora_upos_skipgram_300_2_2019.json'
-NORMS_FILE = 'norms_ruscorpora_upos_cbow_300_20_2019.json'
+PUNCTUATION = string.punctuation + ''.join([
+    '–', '—', '‒', '−', '«', '»', '\xa0', '°', '′', '\u2009', '\u200e',
+    '©', '®', '’', '…', '↑', '″', '”', '“', '•', '№',
+    ])
+# NORMS_FILE, LEMMR = ('./norms_sg_base.json', 'pymorphy')
+# NORMS_FILE, LEMMR = ('./norms_cbow_base.json', 'pymorphy')
+# NORMS_FILE, LEMMR = ('./norms_glove_50k.json', 'pymorphy')
+# NORMS_FILE, LEMMR = ('./norms_sg_full.json', 'pymorphy')
+# NORMS_FILE, LEMMR = ('./norms_cbow_full.json', 'pymorphy')
+# NORMS_FILE, LEMMR = (
+#     'norms_ruwikiruscorpora-func_upos_skipgram_300_5_2019.json', 'mystem')
+# NORMS_FILE, LEMMR = (
+#     'norms_ruwikiruscorpora_upos_skipgram_300_2_2019.json', 'mystem')
+NORMS_FILE, LEMMR = ('norms_ruscorpora_upos_cbow_300_20_2019.json', 'mystem')
 
 with open('../normalized_idf/normalized_idf.json') as f:
     normalised_idf = json.loads(f.read())
@@ -88,49 +94,99 @@ def work_with_cfg():
     return json.dumps(spans)
 
 
-def input_to_words(input):
-    texts = [x['text'] for x in input]
-    return [word for word in
-                (token.strip(PUNCTUATION)
-                 for text in texts
-                 for token in text.split())
-                if word]
+def tokenize_lemmatize_input(inp, lem='pymorphy'):
+    """
+    :param inp: server input in unified format
+    :param lem: tokeniztaion and lemmatisation method
+    :return: grouped tokens and grouped lemmatised tokens,
+    grouping is by node, same as in inp
+    """
+    texts = (x['text'] for x in inp)
+    tokens, normalized_tokens = [], []
+    if lem == 'pymorphy':
+        no_normal = object()
+        for text in texts:
+            cur_tokens = [word for word in
+                          (token.strip(PUNCTUATION)
+                           for token in text.split())
+                          if word]
+            cur_normalized_tokens = [
+                morph.parse(word)[0].normal_form or no_normal
+                for word in cur_tokens]
+            tokens.append(cur_tokens)
+            normalized_tokens.append(cur_normalized_tokens)
+    elif lem == 'mystem':
+        for text in texts:
+            cur_tokens, cur_normalized_tokens = tag_mystem(
+                text, mapping=mystem2upos
+            )
+            tokens.append(cur_tokens)
+            normalized_tokens.append(cur_normalized_tokens)
+    else:
+        assert False, 'wrong lemmatiser, expected on of ["mystem", "pymorphy"]'
+    return tokens, normalized_tokens
 
 
-def important_words_to_spans(important_words, input):
+def important_words_to_spans(important_words, input,
+                             grouped_words, spaces_skipped=True):
+    """
+    :param important_words: flat set of important (not normalized) words
+    :param input: server input in unified format
+    :param grouped_words: document tokens grouped by node (list of lists)
+    :param spaces_skipped: if spaces skipped in tokenization
+    :return: list of lists_of_spans_in_each_node;
+    span is a tuple (begin_ind, end_ind) -- halfopen interval of a highlight
+    """
     grouped_spans = []
-    for node in input:
+    for node, words in zip(input, grouped_words):
         cur_pos = 0
         text = node['text']
         cur_spans = []
-        for word in text.split():
-            if word.strip(PUNCTUATION) in important_words:
+        for word in words:
+            if word in important_words:
                 beg = text.find(word, cur_pos)
                 cur_pos = end = beg + len(word)
                 cur_spans.append((beg, end))
             else:
-                cur_pos += len(word) + 1
+                # trying to compensate for spaces - 1 per word in avg
+                cur_pos += len(word) + int(spaces_skipped)
         grouped_spans.append(cur_spans)
     return grouped_spans
 
 
-def sorted_tfidfs_to_spans(sorted_tfidfs, input):
+def sorted_tfidfs_to_spans(sorted_tfidfs, input, grouped_words):
     n_important = int(len(sorted_tfidfs) * SHARE)
     important_words = {tf_idf_info['word']
                        for tf_idf_info in sorted_tfidfs[:n_important]}
-    return important_words_to_spans(important_words, input)
+    return important_words_to_spans(important_words, input, grouped_words)
+
+
+def choose_n_important(sorted_pairs, min_share=0.05, max_share=0.4):
+    if not sorted_pairs:
+        return 0
+    declines = [(prev[1] / cur[1], i)
+                for i, (prev, cur)
+                in enumerate(
+                    zip(sorted_pairs, sorted_pairs[1:]),
+                    start=1
+                )]
+    min_ind, max_ind = (int(share * len(sorted_pairs))
+                        for share in [min_share, max_share])
+    _, n_important = max(declines[min_ind : max_ind + 1])
+    return n_important
 
 
 @app.route('/tf-idf', methods=['POST'])
 def handleTF_IDF():
     input = json.loads(request.data)
-    words = input_to_words(input)
-    normalized_words = []
+    gr_words, gr_normalized_words = tokenize_lemmatize_input(
+        input, lem='pymorphy'
+    )
+    words = list(itertools.chain(*gr_words))
+    normalized_words = list(itertools.chain(*gr_normalized_words))
+
     results = []
     included_normal_forms = {}
-
-    for i, word in enumerate(words):
-        normalized_words.append(morph.parse(word)[0].normal_form)
 
     doc_length = len(normalized_words)
     for i, word in enumerate(normalized_words):
@@ -167,65 +223,19 @@ def handleTF_IDF():
     sorted_tfidfs = sorted(results, key=operator.itemgetter('tf_idf'),
                            reverse=True)
 
-    return json.dumps(sorted_tfidfs_to_spans(sorted_tfidfs, input))
+    return json.dumps(sorted_tfidfs_to_spans(sorted_tfidfs, input, gr_words))
 
 
-def choose_n_important(sorted_pairs, min_share=0.05, max_share=0.4):
-    if not sorted_pairs:
-        return 0
-    declines = [(prev[1] / cur[1], i)
-                for i, (prev, cur)
-                in enumerate(
-                    zip(sorted_pairs, sorted_pairs[1:]),
-                    start=1
-                )]
-    min_ind, max_ind = (int(share * len(sorted_pairs))
-                        for share in [min_share, max_share])
-    _, n_important = max(declines[min_ind : max_ind + 1])
-    return n_important
+DEBUG_PRINT = True
 
 
 @app.route('/w2v', methods=['POST'])
-def highlight_with_v2w_norm():
-    input = json.loads(request.data)
-    words = input_to_words(input)
+def highlight_with_w2v_norm():
+    inp = json.loads(request.data)
 
-    no_normal = object()
-    normalized_words = [morph.parse(word)[0].normal_form or no_normal
-                        for word in words]
-    
-    norms = {normalized_word: vector_norms.get(normalized_word, 1e-6)
-             for normalized_word in normalized_words}
+    tokens, normalized_tokens = tokenize_lemmatize_input(inp, lem=LEMMR)
 
-    vector_norms_sorted = sorted(norms.items(),
-                                 key=lambda x: x[1], 
-                                 reverse=True)
-
-    n_important = choose_n_important(vector_norms_sorted,
-                                     min_share=0.2, max_share=0.3)
-
-    important_normalized_words = {normalized_word for normalized_word, norm
-                                  in vector_norms_sorted[:n_important]}
-    important_words = {word for word, normalized_word
-                       in zip(words, normalized_words)
-                       if normalized_word in important_normalized_words}
-
-    return json.dumps(important_words_to_spans(important_words, input))
-
-
-@app.route('/w2v_rv', methods=['POST'])
-def highlight_with_rusvectores_norm():
-    input = json.loads(request.data)
-    texts = [x['text'] for x in input]
-    tokens, normalized_tokens = [], []
-    for text in texts:
-        cur_tokens, cur_normalized_tokens = tag_mystem(
-            text, mapping=mystem2upos
-        )
-        tokens.append(cur_tokens)
-        normalized_tokens.append(cur_normalized_tokens)
-
-    norms = {normalized_token: vector_norms.get(normalized_token, 1e-6)
+    norms = {normalized_token: vector_norms.get(normalized_token, float('-inf'))
              for normalized_token in itertools.chain(*normalized_tokens)}
 
     vector_norms_sorted = sorted(norms.items(),
@@ -236,26 +246,68 @@ def highlight_with_rusvectores_norm():
                                      min_share=0.2, max_share=0.3)
 
     important_normalized_tokens = {normalized_word for normalized_word, norm
-                                  in vector_norms_sorted[:n_important]}
-    important_words = {token
-                       for cur_tokens, cur_normalized_tokens
-                       in zip(tokens, normalized_tokens)
-                       for token, normalized_token
-                       in zip(cur_tokens, cur_normalized_tokens)
-                       if normalized_token in important_normalized_tokens}
+                                   in vector_norms_sorted[:n_important]}
 
+    important_tokens = {token
+                        for cur_tokens, cur_normalized_tokens
+                        in zip(tokens, normalized_tokens)
+                        for token, normalized_token
+                        in zip(cur_tokens, cur_normalized_tokens)
+                        if normalized_token in important_normalized_tokens}
+
+    if not DEBUG_PRINT:
+        return json.dumps(
+            important_words_to_spans(important_tokens, inp, tokens)
+        )
+
+    #
+    print(f'\nmin_highlighted_norm = {vector_norms_sorted[n_important - 1][1]}',
+          end='\n_____________________________________________\n\n')
+    debug_printing = False
+    ### example-specific
+    start_promoters = ['Туркиль из Беркшира', 'поликистозом',
+                       'дав начало созданию государственного аппарата Литвы']
+    end_promoters = ['Перед каждой из трёх армий Вильгельм поставил лучников',
+                     'делириозные состояния',
+                     'Вторая мировая война и присоединение к СССР']
+    #
     grouped_spans = []
-    for node, words in zip(input, tokens):
+    for node, words, normalized_words in zip(inp, tokens, normalized_tokens):
         cur_pos = 0
         text = node['text']
         cur_spans = []
-        for word in words:
-            if word in important_words:
+        #
+        debug_text = []
+        punkt_space = PUNCTUATION + string.whitespace
+        #
+        for word, normalized in zip(words, normalized_words):
+            if word in important_tokens:
                 beg = text.find(word, cur_pos)
                 cur_pos = end = beg + len(word)
                 cur_spans.append((beg, end))
+                #
+                highlighted = True
+                #
             else:
                 cur_pos += len(word)
+                #
+                highlighted = False
+                #
+            #
+            mark = '*' if highlighted else ''
+            no_norm = all(c in punkt_space for c in word)
+            norm = (f'|{round(vector_norms.get(normalized, float("-inf")), 1)}|'
+                    if not no_norm else '')
+            debug_text.append(f'{mark}{word}{mark}{norm}')
+            #
+        #
+        if debug_printing:
+            print(''.join(debug_text), end='')
+        if any(p in text for p in start_promoters):
+            debug_printing = True
+        elif any(p in text for p in end_promoters):
+            debug_printing = False
+            print()
+        #
         grouped_spans.append(cur_spans)
     return json.dumps(grouped_spans)
-

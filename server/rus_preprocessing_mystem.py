@@ -50,6 +50,8 @@ def tag_mystem(text='Текст нужно передать функции в в
         tagged.append(normtag)
     if not postags:
         tagged = [t.split('_')[0] for t in tagged]
+    if not text.endswith('\n') and tokens and tokens[-1].endswith('\n'):
+        tokens[-1] = tokens[-1][:-1]
     return tokens, tagged
 
 
