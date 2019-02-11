@@ -4,11 +4,14 @@ import operator
 import re
 import string
 import time
+import threading
+from collections import Counter
 from pprint import pprint
 
 import pymorphy2
 from flask import Flask, request
 
+import matplotlib.pyplot as plt
 from entity_finder import find_entities
 from rus_preprocessing_mystem import (tag_mystem, mystem2upos)
 
@@ -227,6 +230,7 @@ def handleTF_IDF():
 
 
 DEBUG_PRINT = True
+USE_TFIDF_W2V_PRODUCT = True
 
 
 @app.route('/w2v', methods=['POST'])
@@ -235,8 +239,26 @@ def highlight_with_w2v_norm():
 
     tokens, normalized_tokens = tokenize_lemmatize_input(inp, lem=LEMMR)
 
-    norms = {normalized_token: vector_norms.get(normalized_token, float('-inf'))
-             for normalized_token in itertools.chain(*normalized_tokens)}
+    if not USE_TFIDF_W2V_PRODUCT:
+        norms = {normalized_token: vector_norms.get(normalized_token, float('-inf'))
+                 for normalized_token in itertools.chain(*normalized_tokens)}
+    else:
+        norms = {}
+        mean_idf = sum(normalised_idf.values()) / len(normalised_idf)
+        mean_norm = sum(vector_norms.values()) / len(vector_norms)
+        tfs = Counter(itertools.chain(*normalized_tokens))
+        doc_length = sum(1 for _ in itertools.chain(*normalized_tokens))
+        for normalized_token in itertools.chain(*normalized_tokens):
+            lemma = normalized_token.split('__')[0]
+            if (not lemma  # normal form doesn't exist
+                or all(c in (PUNCTUATION + string.whitespace + string.digits)
+                       for c in lemma)):  # normal form doesn't have letters
+                norms[normalized_token] = float('-inf')
+            else:
+                idf = 1 / normalised_idf.get(lemma, mean_idf)
+                tf = tfs[normalized_token]
+                vnorm = vector_norms.get(normalized_token, mean_norm)
+                norms[normalized_token] = tf * idf * vnorm * 1_000_000 / doc_length
 
     vector_norms_sorted = sorted(norms.items(),
                                  key=lambda x: x[1],
@@ -261,15 +283,26 @@ def highlight_with_w2v_norm():
         )
 
     #
-    print(f'\nmin_highlighted_norm = {vector_norms_sorted[n_important - 1][1]}',
-          end='\n_____________________________________________\n\n')
+    min_norm = vector_norms_sorted[n_important - 1][1]
+    hl_share = n_important / len(vector_norms_sorted)
+    # with open(f'{NORMS_FILE.split(".")[0]}_plot_info.json', 'w') as f:
+    #     json.dump({
+    #         'sorted_norms': vector_norms_sorted,
+    #         'min_norm': min_norm
+    #     }, f)
+    print(30 * '\n',
+          f'min_highlighted_norm = {min_norm}',
+          f'highlighted_share = {round(hl_share, 2)}',
+          '_____________________________________________',
+          sep='\n')
     debug_printing = False
     ### example-specific
     start_promoters = ['Туркиль из Беркшира', 'поликистозом',
                        'дав начало созданию государственного аппарата Литвы']
-    end_promoters = ['Перед каждой из трёх армий Вильгельм поставил лучников',
-                     'делириозные состояния',
-                     'Вторая мировая война и присоединение к СССР']
+    end_promoters = ['армия Гарольда достигла Гастингса',
+                     'Соматические нарушения, сопутствующие делирию',
+                     'В 1921 году страна была принята в']
+    delim = ' ' if LEMMR == 'pymorphy' else ''
     #
     grouped_spans = []
     for node, words, normalized_words in zip(inp, tokens, normalized_tokens):
@@ -296,13 +329,13 @@ def highlight_with_w2v_norm():
             #
             mark = '*' if highlighted else ''
             no_norm = all(c in punkt_space for c in word)
-            norm = (f'|{round(vector_norms.get(normalized, float("-inf")), 1)}|'
+            norm = (f'|{round(norms.get(normalized, float("-inf")), 1)}|'
                     if not no_norm else '')
             debug_text.append(f'{mark}{word}{mark}{norm}')
             #
         #
         if debug_printing:
-            print(''.join(debug_text), end='')
+            print(delim.join(debug_text), end='')
         if any(p in text for p in start_promoters):
             debug_printing = True
         elif any(p in text for p in end_promoters):
