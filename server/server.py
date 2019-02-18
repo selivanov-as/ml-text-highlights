@@ -29,9 +29,11 @@ PUNCTUATION = string.punctuation + ''.join([
 # NORMS_FILE, LEMMR = ('./norms_cbow_full.json', 'pymorphy')
 # NORMS_FILE, LEMMR = (
 #     'norms_ruwikiruscorpora-func_upos_skipgram_300_5_2019.json', 'mystem')
-# NORMS_FILE, LEMMR = (
-#     'norms_ruwikiruscorpora_upos_skipgram_300_2_2019.json', 'mystem')
-NORMS_FILE, LEMMR = ('norms_ruscorpora_upos_cbow_300_20_2019.json', 'mystem')
+NORMS_FILE, LEMMR = (
+    'norms_ruwikiruscorpora_upos_skipgram_300_2_2019.json', 'mystem')
+# NORMS_FILE, LEMMR = ('norms_ruscorpora_upos_cbow_300_20_2019.json', 'mystem')
+# NORMS_FILE, LEMMR = ('norms_tenth.norm-sz500-w7-cb0-it5-min5.json', None)
+
 
 with open('../normalized_idf/normalized_idf.json') as f:
     normalised_idf = json.loads(f.read())
@@ -41,6 +43,20 @@ with open("./stopwords.txt") as f:
 
 with open(NORMS_FILE) as f:
     vector_norms = json.load(f)
+
+
+def median(somelist):
+    if not somelist:
+        return None
+    if len(somelist) % 2:  # odd num of el
+        return somelist[len(somelist) // 2]
+    else:
+        return (somelist[len(somelist) // 2]
+                + somelist[len(somelist) // 2 + 1]) / 2
+
+
+median_idf = median(sorted(normalised_idf.values()))
+median_norm = median(sorted(vector_norms.values()))
 
 stop_words = {}
 for x in stop_words_list:
@@ -125,8 +141,11 @@ def tokenize_lemmatize_input(inp, lem='pymorphy'):
             )
             tokens.append(cur_tokens)
             normalized_tokens.append(cur_normalized_tokens)
+    elif lem is None:
+        tokens = [text.split() for text in texts]
+        normalized_tokens = list(tokens)
     else:
-        assert False, 'wrong lemmatiser, expected on of ["mystem", "pymorphy"]'
+        assert False, '''wrong lemmatiser, expected on of ["mystem", "pymorphy", None]'''
     return tokens, normalized_tokens
 
 
@@ -167,7 +186,7 @@ def sorted_tfidfs_to_spans(sorted_tfidfs, input, grouped_words):
 def choose_n_important(sorted_pairs, min_share=0.05, max_share=0.4):
     if not sorted_pairs:
         return 0
-    declines = [(prev[1] / cur[1], i)
+    declines = [(prev[1][0] / cur[1][0], i)
                 for i, (prev, cur)
                 in enumerate(
                     zip(sorted_pairs, sorted_pairs[1:]),
@@ -240,25 +259,40 @@ def highlight_with_w2v_norm():
     tokens, normalized_tokens = tokenize_lemmatize_input(inp, lem=LEMMR)
 
     if not USE_TFIDF_W2V_PRODUCT:
-        norms = {normalized_token: vector_norms.get(normalized_token, float('-inf'))
-                 for normalized_token in itertools.chain(*normalized_tokens)}
+        if LEMMR is None:
+            norms = {}
+            for normalized_token in itertools.chain(*normalized_tokens):
+                stripped = normalized_token.strip(
+                    PUNCTUATION + string.whitespace
+                )
+                norm = (
+                    vector_norms.get(normalized_token)
+                    or vector_norms.get(stripped)
+                    or vector_norms.get(morph.parse(stripped)[0].normal_form)
+                    or float('-inf')
+                )
+                norms[normalized_token] = (norm,)
+        else:
+            norms = {normalized_token: (vector_norms.get(normalized_token, float('-inf')),)
+                     for normalized_token in itertools.chain(*normalized_tokens)}
     else:
         norms = {}
-        mean_idf = sum(normalised_idf.values()) / len(normalised_idf)
-        mean_norm = sum(vector_norms.values()) / len(vector_norms)
         tfs = Counter(itertools.chain(*normalized_tokens))
         doc_length = sum(1 for _ in itertools.chain(*normalized_tokens))
         for normalized_token in itertools.chain(*normalized_tokens):
-            lemma = normalized_token.split('__')[0]
+            lemma = normalized_token.split('_')[0]
             if (not lemma  # normal form doesn't exist
                 or all(c in (PUNCTUATION + string.whitespace + string.digits)
                        for c in lemma)):  # normal form doesn't have letters
-                norms[normalized_token] = float('-inf')
+                norms[normalized_token] = (float('-inf'),)
             else:
-                idf = 1 / normalised_idf.get(lemma, mean_idf)
+                idf = 1 / normalised_idf.get(lemma, median_idf)
                 tf = tfs[normalized_token]
-                vnorm = vector_norms.get(normalized_token, mean_norm)
-                norms[normalized_token] = tf * idf * vnorm * 1_000_000 / doc_length
+                vnorm = vector_norms.get(normalized_token, median_norm)
+                norms[normalized_token] = (
+                    tf * idf * vnorm**(16) * 1_000_000 / doc_length,
+                    tf * idf * 1_000_000 / doc_length, vnorm
+                )
 
     vector_norms_sorted = sorted(norms.items(),
                                  key=lambda x: x[1],
@@ -293,6 +327,8 @@ def highlight_with_w2v_norm():
     print(30 * '\n',
           f'min_highlighted_norm = {min_norm}',
           f'highlighted_share = {round(hl_share, 2)}',
+          f'median_idf = {median_idf}',
+          f'median_norm = {median_norm}',
           '_____________________________________________',
           sep='\n')
     debug_printing = False
@@ -329,7 +365,7 @@ def highlight_with_w2v_norm():
             #
             mark = '*' if highlighted else ''
             no_norm = all(c in punkt_space for c in word)
-            norm = (f'|{round(norms.get(normalized, float("-inf")), 1)}|'
+            norm = (f'|{",".join([format(el, ".1f") for el in norms.get(normalized, (float("-inf"),))])}|'
                     if not no_norm else '')
             debug_text.append(f'{mark}{word}{mark}{norm}')
             #
