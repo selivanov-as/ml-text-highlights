@@ -39,9 +39,9 @@ with codecs.open(file_name, "r", "utf-8") as fin:
         process_article_with_pos_tagger(line)
         articles_amount += 1
 
-        if i > 0 and i % 13233 == 0:
+        if i > 0 and i % 12657 == 0:
             print(f"Processed {i} articles.")
-            print(f"{(time.time() - start_time) // 60} minutes elapsed for last 5000 articles")
+            print(f"{(time.time() - start_time) // 60} minutes elapsed for last 12657 (~1%) articles")
             print()
 
             start_time = time.time()
