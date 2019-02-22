@@ -1,62 +1,80 @@
 import pymorphy2
 import codecs
 import time
+import itertools
 import json
 from collections import Counter
 import operator
+import pickle
 
 morph = pymorphy2.MorphAnalyzer()
-pos_dict, pos_set = dict(), set()
-used_normal_forms_in_current_article = dict()
-IS_DEBUG = True
+
+IS_DEBUG = False
 
 
 def process_article_with_pos_tagger(article):
-    pos_dict.clear()
-    pos_dict["tokens_amount"] = 0
 
-    for w in article.strip().split(" "):
-        parse_result = morph.parse(w)[0]
-        normal_form, pos = parse_result.normal_form, parse_result.tag.POS
-        should_use_normal_form = pos == "NOUN" or pos == "ADJF" or pos == "ADJS" or pos == "VERB" or pos == "INFN"
-        token_to_append = normal_form if should_use_normal_form else w
+    raw_tokens = article.strip().split()
+    try:
+        processed = [morph.parse(token)[0] for token in raw_tokens]
+    except (KeyError, ValueError):
+        return Counter()
+    processed = [(parsed.normal_form, str(parsed.tag.POS), raw_token)  # yep, lets store original tokens too, just in case
+                 for parsed, raw_token in zip(processed, raw_tokens)]
 
-        if pos in pos_dict:
-            pos_dict[pos].append(token_to_append)
-        else:
-            pos_dict[pos] = [token_to_append]
+    return Counter(processed)
 
-        pos_dict["tokens_amount"] += 1
-        pos_set.add(pos)
+# отличается предобработкой с удалением ударений, разбивающих слова
+file_name = "../wiki.ru.wo_emph.text"   #  "wiki.ru.text"
 
+with open(file_name, encoding="utf-8") as fin:
+    counts = Counter()
 
-file_name = "wiki.ru.text"
-
-with codecs.open(file_name, "r", "utf-8") as fin:
-    start_time, articles_amount = time.time(), 0
-
+    start = prev = time.perf_counter()
+    n = 1000
     for i, line in enumerate(fin):  # traverses each article
-        process_article_with_pos_tagger(line)
-        articles_amount += 1
+        cur_counts = process_article_with_pos_tagger(line)
+        # counts += cur_counts  # suprisingly, this is O(len(counts))
+        for k, v in cur_counts.items():
+            counts[k] += v
 
-        if i > 0 and i % 12657 == 0:
-            print(f"Processed {i} articles.")
-            print(f"{(time.time() - start_time) // 60} minutes elapsed for last 12657 (~1%) articles")
-            print()
-
-            start_time = time.time()
+        if i and i % n == 0:
+            cur = time.perf_counter()
+            total = int(cur - start)
+            print(f'{i}it',
+                  f'{total // (60*60)}:{total % (60*60) // 60}:{total % 60}',
+                  f'{round(n / (cur - prev), 2)}it/s')
+            prev = cur
 
         if IS_DEBUG:
-            if i >= 500:
+            if i >= 5 * n:
                 break
 
-    print(f"{articles_amount // 1265739 * 100} articles processed. Saving pos dictionary...")
+print(f"{i + 1} articles processed. Saving pos dictionary...")
 
-    for pos in pos_set:
-        words_of_particular_pos = Counter(pos_dict[pos])
-        words_of_particular_pos_sorted = sorted(words_of_particular_pos.items(), reverse=True,
-                                                key=operator.itemgetter(1))
-        pos_dict[pos] = words_of_particular_pos_sorted[0:100]
+# save raw counts
+with open('raw_counts.pkl', 'wb') as f:
+    pickle.dump(counts, f)
 
-    with open("pymorphy2.json", "w", encoding="utf-8") as fp:
-        json.dump(pos_dict, fp, ensure_ascii=False)
+tokens_amount = sum(counts.values())
+sorted_by_tag = sorted(counts.items(), key=lambda t: t[0][1])
+
+by_tag = {}
+# itertools magic
+for tag, tokens_with_same_tag in itertools.groupby(sorted_by_tag,
+                                                   key=lambda t: t[0][1]):
+    by_tag[tag] = list(tokens_with_same_tag)
+
+for tag in by_tag:
+    tokens_with_same_tag = by_tag[tag]
+    sorted_by_nf = sorted(tokens_with_same_tag, key=lambda t: t[0][0])
+    grouped_by_nf = [(normal_form, sum(t[1] for t in same_nf))
+                     for normal_form, same_nf in itertools.groupby(
+                         sorted_by_nf, key=lambda t: t[0][0]
+                     )]
+    grouped_by_nf.sort(key=lambda pair: pair[1], reverse=True)
+    by_tag[tag] = grouped_by_nf
+
+by_tag['tokens_amount'] = tokens_amount
+with open("pymorphy2_.json", "w", encoding="utf-8") as fp:
+    json.dump(by_tag, fp, ensure_ascii=False)
