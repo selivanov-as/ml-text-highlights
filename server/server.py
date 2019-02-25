@@ -25,12 +25,12 @@ PUNCTUATION = string.punctuation + ''.join([
 # NORMS_FILE, LEMMR = ('./norms_sg_base.json', 'pymorphy')
 # NORMS_FILE, LEMMR = ('./norms_cbow_base.json', 'pymorphy')
 # NORMS_FILE, LEMMR = ('./norms_glove_50k.json', 'pymorphy')
-# NORMS_FILE, LEMMR = ('./norms_sg_full.json', 'pymorphy')
+NORMS_FILE, LEMMR = ('./norms_sg_full.json', 'pymorphy')
 # NORMS_FILE, LEMMR = ('./norms_cbow_full.json', 'pymorphy')
 # NORMS_FILE, LEMMR = (
 #     'norms_ruwikiruscorpora-func_upos_skipgram_300_5_2019.json', 'mystem')
-NORMS_FILE, LEMMR = (
-    'norms_ruwikiruscorpora_upos_skipgram_300_2_2019.json', 'mystem')
+# NORMS_FILE, LEMMR = (
+#     'norms_ruwikiruscorpora_upos_skipgram_300_2_2019.json', 'mystem')
 # NORMS_FILE, LEMMR = ('norms_ruscorpora_upos_cbow_300_20_2019.json', 'mystem')
 # NORMS_FILE, LEMMR = ('norms_tenth.norm-sz500-w7-cb0-it5-min5.json', None)
 
@@ -150,7 +150,9 @@ def tokenize_lemmatize_input(inp, lem='pymorphy'):
 
 
 def important_words_to_spans(important_words, input,
-                             grouped_words, spaces_skipped=True):
+                             grouped_words, spaces_skipped=True,
+                             use_normalised=False, grouped_norm_words=None,
+                             important_norm_words=None):
     """
     :param important_words: flat set of important (not normalized) words
     :param input: server input in unified format
@@ -160,12 +162,16 @@ def important_words_to_spans(important_words, input,
     span is a tuple (begin_ind, end_ind) -- halfopen interval of a highlight
     """
     grouped_spans = []
-    for node, words in zip(input, grouped_words):
+    for i, (node, words) in enumerate(zip(input, grouped_words)):
         cur_pos = 0
         text = node['text']
         cur_spans = []
-        for word in words:
-            if word in important_words:
+        for j, word in enumerate(words):
+            if (
+                    (use_normalised
+                     and grouped_norm_words[i][j] in important_norm_words)
+                    or (not use_normalised and word in important_words)
+            ):
                 beg = text.find(word, cur_pos)
                 cur_pos = end = beg + len(word)
                 cur_spans.append((beg, end))
@@ -291,7 +297,7 @@ def highlight_with_w2v_norm():
                 vnorm = vector_norms.get(normalized_token, median_norm)
                 norms[normalized_token] = (
                     tf * idf * vnorm**(16) * 1_000_000 / doc_length,
-                    tf * idf * 1_000_000 / doc_length, vnorm
+                    tf * idf * 1_000_000 / doc_length, tf, 1/idf, vnorm
                 )
 
     vector_norms_sorted = sorted(norms.items(),
@@ -313,9 +319,20 @@ def highlight_with_w2v_norm():
 
     if not DEBUG_PRINT:
         return json.dumps(
-            important_words_to_spans(important_tokens, inp, tokens)
+            important_words_to_spans(
+                important_tokens, inp, tokens,
+                spaces_skipped=(LEMMR == 'pymorphy'),
+                use_normalised=True, grouped_norm_words=normalized_tokens,
+                important_norm_words=important_normalized_tokens)
         )
 
+    grouped_words = tokens
+    input = inp
+    important_words = important_tokens
+    spaces_skipped = (LEMMR == 'pymorphy')
+    use_normalised = True
+    grouped_norm_words = normalized_tokens
+    important_norm_words = important_normalized_tokens
     #
     min_norm = vector_norms_sorted[n_important - 1][1]
     hl_share = n_important / len(vector_norms_sorted)
@@ -341,7 +358,7 @@ def highlight_with_w2v_norm():
     delim = ' ' if LEMMR == 'pymorphy' else ''
     #
     grouped_spans = []
-    for node, words, normalized_words in zip(inp, tokens, normalized_tokens):
+    for i, (node, words) in enumerate(zip(input, grouped_words)):
         cur_pos = 0
         text = node['text']
         cur_spans = []
@@ -349,8 +366,12 @@ def highlight_with_w2v_norm():
         debug_text = []
         punkt_space = PUNCTUATION + string.whitespace
         #
-        for word, normalized in zip(words, normalized_words):
-            if word in important_tokens:
+        for j, word in enumerate(words):
+            if (
+                    (use_normalised
+                     and grouped_norm_words[i][j] in important_norm_words)
+                    or (not use_normalised and word in important_words)
+            ):
                 beg = text.find(word, cur_pos)
                 cur_pos = end = beg + len(word)
                 cur_spans.append((beg, end))
@@ -358,15 +379,20 @@ def highlight_with_w2v_norm():
                 highlighted = True
                 #
             else:
-                cur_pos += len(word)
+                # trying to compensate for spaces - 1 per word in avg
+                cur_pos += len(word) + int(spaces_skipped)
                 #
                 highlighted = False
                 #
             #
             mark = '*' if highlighted else ''
             no_norm = all(c in punkt_space for c in word)
-            norm = (f'|{",".join([format(el, ".1f") for el in norms.get(normalized, (float("-inf"),))])}|'
-                    if not no_norm else '')
+            info = ";".join(
+                [format(el, ".1f") for el in norms.get(
+                    grouped_norm_words[i][j], (float("-inf"),)
+                )]
+            )
+            norm = (f'|{info}|' if not no_norm else '')
             debug_text.append(f'{mark}{word}{mark}{norm}')
             #
         #
