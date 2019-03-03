@@ -15,5 +15,11 @@
   "bugs": {
     "url": "https://github.com/selivanov-as/ml-text-highlights/issues"
   },
-  "homepage": "https://github.com/selivanov-as/ml-text-highlights#readme"
+  "homepage": "https://github.com/selivanov-as/ml-text-highlights#readme",
+  "dependencies": {
+    "del": "^3.0.0",
+    "gulp": "^4.0.0",
+    "gulp-lambda-deploy": "^0.3.0",
+    "gulp-zip": "^4.2.0"
+  }
 }
