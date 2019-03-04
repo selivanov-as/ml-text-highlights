@@ -35,6 +35,19 @@ https://gist.github.com/bulgakovk/4d81cdfb12bc0edab8f0f1fa0c578bc4
 Лемматизация и обучение моделей с 27 страницы:
 http://www.machinelearning.ru/wiki/images/7/7e/Mel_lain_msu_nlp_sem_5.pdf
 
+## Count PR/AC/Recall and F1 Score
+* Скрипт для подсчета метрик качества и размеченные данные находятся в `/server`
+
+* `samples_raw.py` содержит размеченные тексты. Символ `@` перед словом, означает, 
+что данное слово должно быть выделено как важное
+
+* Чтобы запустить подсчет метрик необходимо выполнить команду `python script.py`,
+находясь в `/server`.
+
+*  Метод, используемый для подсчета метрик может быть изменен в 4-й строке:
+`METHOD = tf_idf_normalized` с `tf_idf_normalized` на любой другой метод, 
+возвращающий тот же самый список слов, обернутых в объект с булевым
+свойством `highlight`
 ## Configuring AWS Lambda
 * Login or register new account on [AWS console](https://aws.amazon.com/ru/lambda/) page.  
 * Create new or open existing function to edit [here.](https://eu-west-1.console.aws.amazon.com/lambda/home?region=eu-west-1#/functions)
