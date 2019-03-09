@@ -2,6 +2,8 @@ node_modules
 .idea
 package-lock.json
 .DS_Store
-venv
 dist
 dist.zip
+!venv/
+venv/*
+!venv/lib/

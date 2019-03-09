@@ -2,6 +2,11 @@ import json
 import string
 import pymorphy2
 import operator
+import logging
+import base64
+
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
 
 from tf_idf_normalized import tf_idf_normalized
 
@@ -42,15 +47,15 @@ def sorted_tfidfs_to_spans(sorted_tfidfs, input):
 
 
 def handler(event, context):
-    input = json.loads(event["body"])
+    body = json.loads(base64.b64decode(event["body"]).decode('utf-8'))
+    # body = json.loads(event["body"])
 
-    words = input_to_words(input["texts"])
+    words = input_to_words(body["texts"])
     results = tf_idf_normalized(words)
     sorted_tfidfs = sorted(results, key=lambda word: word['tf_idf'], reverse=True)
 
     return {
         'statusCode': 200,
         'headers': {'Content-Type': 'application/json'},
-        'body': json.dumps(sorted_tfidfs_to_spans(sorted_tfidfs, input["texts"]))
-        # 'body': json.dumps(sorted_tfidfs)
+        'body': json.dumps(sorted_tfidfs_to_spans(sorted_tfidfs, body["texts"]))
     }
