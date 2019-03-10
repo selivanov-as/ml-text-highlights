@@ -35,6 +35,21 @@ https://gist.github.com/bulgakovk/4d81cdfb12bc0edab8f0f1fa0c578bc4
 Лемматизация и обучение моделей с 27 страницы:
 http://www.machinelearning.ru/wiki/images/7/7e/Mel_lain_msu_nlp_sem_5.pdf
 
+## Email Screenshots
+To make screenshots run:
+
+`npm i`
+
+`node util/email_screenshots.js`
+
+Don't forget to change amount of emails on line 6:
+```
+EMAILS_AMOUNT = 20
+```
+In case of using MacOS (and possibly Linux) also pre-install:
+
+`npm install -g chromedriver`
+ 
 ## Count PR/AC/Recall and F1 Score
 * Скрипт для подсчета метрик качества и размеченные данные находятся в `/server`
 
