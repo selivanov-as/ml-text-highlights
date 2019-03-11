@@ -1,18 +1,26 @@
+import itertools
 import json
 import operator
+import re
 import string
 import time
+import threading
+from collections import Counter
 from pprint import pprint
 
 import pymorphy2
 from flask import Flask, request
+from gensim.summarization import keywords, summarize
 
 from entity_finder import find_entities
 
 
 THR = 0.25
 SHARE = 0.3
-PUNCTUATION = string.punctuation + "–—‒"
+PUNCTUATION = string.punctuation + ''.join([
+    '–', '—', '‒', '−', '«', '»', '\xa0', '°', '′', '\u2009', '\u200e',
+    '©', '®', '’', '…', '↑', '″', '”', '“', '•', '№',
+    ])
 
 with open('../normalized_idf/normalized_idf.json') as f:
     normalised_idf = json.loads(f.read())
@@ -29,39 +37,45 @@ morph = pymorphy2.MorphAnalyzer()
 app = Flask(__name__)
 
 
-def find_with_cfg_in_texts(texts, dlm=' '):
-    joined = dlm.join(texts)
+def joined_spans_to_grouped_spans(spans, texts, dlm, joined):
     borders = []
     end = -len(dlm)
     for text in texts:
         beg = end + len(dlm)
         end = beg + len(text)
         borders.append((beg, end))
-        
+
     assert len(borders) == len(texts), (len(borders), len(texts))
     assert borders[-1][1] == len(joined), (borders[-1][1], len(joined))
-    
-    #begin = time.perf_counter()
-    spans = find_entities(joined)
-    #cfg_time = time.perf_counter() - begin
-    #print(f'cfg_time: {cfg_time} s')
-    
+
     cur_ind = 0
     grouped_spans = []
-    
+
     for (beg, end) in borders:
         start_ind = cur_ind
         while cur_ind < len(spans) and spans[cur_ind][1] < end:
             cur_ind += 1
         cur_spans = spans[start_ind : cur_ind]
-        if cur_ind < len(spans) and spans[cur_ind][0] < end:  # span is divided between text nodes
+        if cur_ind < len(spans) and spans[cur_ind][0] < end:
+            # span is divided between text nodes
             cur_spans.append((spans[cur_ind][0], end))
         cur_spans = [tuple(max(0, x - beg) for x in span)
                             for span in cur_spans]
         grouped_spans.append(cur_spans)
-    
+
     assert len(texts) == len(grouped_spans), (len(texts), len(grouped_spans))
     return grouped_spans
+
+
+def find_with_cfg_in_texts(texts, dlm=' '):
+    joined = dlm.join(texts)
+
+    #begin = time.perf_counter()
+    spans = find_entities(joined)
+    #cfg_time = time.perf_counter() - begin
+    #print(f'cfg_time: {cfg_time} s')
+
+    return joined_spans_to_grouped_spans(spans, texts, dlm, joined)
 
 
 @app.route('/cfg', methods = ['POST'])
@@ -87,7 +101,7 @@ def input_to_words(input):
 def sorted_tfidfs_to_spans(sorted_tfidfs, input):
     n_important = int(len(sorted_tfidfs) * SHARE)
     important_words = {tf_idf_info['word'] for tf_idf_info in sorted_tfidfs[:n_important]}
-    
+
     grouped_spans = []
     for node in input:
         cur_pos = 0
@@ -150,3 +164,53 @@ def handleTF_IDF():
     sorted_tfidfs = sorted(results, key=operator.itemgetter('tf_idf'), reverse=True)
 
     return json.dumps(sorted_tfidfs_to_spans(sorted_tfidfs, input))
+
+
+@app.route('/gensim_kwrd', methods=['POST'])
+def gensim_kwrd():
+    inp = json.loads(request.data)
+    texts = [x['text'] for x in inp]
+
+    dlm = ' '
+    joined = dlm.join(texts).lower()
+
+    kwrds = keywords(joined, ratio=0.3, scores=False, split=True)
+
+    # if one of the keywords is a prefix of another one,
+    # it should be searched for after its superstring keyword:
+    kwrds.sort(reverse=True)
+    regexp_parts = []
+    for kwrd in kwrds:
+        splitted = kwrd.split()  # for single-word kwrd - 1 el list
+        regexp_parts.append(r'\b' + r'\b\W+\b'.join(splitted) + r'\b')
+    regexp = re.compile(r'|'.join(regexp_parts))
+    spans = [match.span() for match in re.finditer(regexp, joined)]
+
+    grouped_spans = joined_spans_to_grouped_spans(spans, texts, dlm, joined)
+    return json.dumps(grouped_spans)
+
+
+@app.route('/gensim_sentences', methods=['POST'])
+def gensim_sentences():
+    inp = json.loads(request.data)
+
+    texts = [x['text'] for x in inp]
+    dlm = ''
+    joined = dlm.join(texts)
+
+    sentences = summarize(joined, ratio=0.2, split=True)
+
+    cur_start = 0
+    spans = []
+    for sent in sentences:
+        beg = joined.find(sent, cur_start)
+        if beg == -1:
+            print('====Not Found!!!====')
+            print(repr(sent))
+            print(repr(joined[cur_start : cur_start + 100]))
+            continue
+        cur_start = end = beg + len(sent)
+        spans.append((beg, end))
+
+    grouped_spans = joined_spans_to_grouped_spans(spans, texts, dlm, joined)
+    return json.dumps(grouped_spans)
