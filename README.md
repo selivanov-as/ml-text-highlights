@@ -1,3 +1,6 @@
+[Плагин](https://chrome.google.com/webstore/detail/highlights/fmmlpalfbokclhhmhbeknjbdfoanjakj?hl=ru)
+
+
 # ML text highlights / Выделение смысла из текста
 
 * Цель
