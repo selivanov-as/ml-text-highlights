@@ -1,6 +1,3 @@
-[Плагин](https://chrome.google.com/webstore/detail/highlights/fmmlpalfbokclhhmhbeknjbdfoanjakj?hl=ru)
-
-
 # ML text highlights / Выделение смысла из текста
 
 * Цель
@@ -38,21 +35,6 @@ https://gist.github.com/bulgakovk/4d81cdfb12bc0edab8f0f1fa0c578bc4
 Лемматизация и обучение моделей с 27 страницы:
 http://www.machinelearning.ru/wiki/images/7/7e/Mel_lain_msu_nlp_sem_5.pdf
 
-## Email Screenshots
-To make screenshots run:
-
-`npm i`
-
-`node util/email_screenshots.js`
-
-Don't forget to change amount of emails on line 6:
-```
-EMAILS_AMOUNT = 20
-```
-In case of using MacOS (and possibly Linux) also pre-install:
-
-`npm install -g chromedriver`
- 
 ## Count PR/AC/Recall and F1 Score
 * Скрипт для подсчета метрик качества и размеченные данные находятся в `/server`
 
@@ -66,27 +48,72 @@ In case of using MacOS (and possibly Linux) also pre-install:
 `METHOD = tf_idf_normalized` с `tf_idf_normalized` на любой другой метод, 
 возвращающий тот же самый список слов, обернутых в объект с булевым
 свойством `highlight`
-## Configuring AWS Lambda
-* Login or register new account on [AWS console](https://aws.amazon.com/ru/lambda/) page.  
-* Create new or open existing function to edit [here.](https://eu-west-1.console.aws.amazon.com/lambda/home?region=eu-west-1#/functions)
-* When your Lambda function is ready, you have to add so called `trigger` that could be able to make requests to your function. 
-Choose `API Gateway` from list in `Designer` menu. 
-* Finish configuring in `API Gateway` menu below and save your HTTP Endpoint. 
-* Now your Lambda function is successfully configured.
 
-## How to deploy source codes to AWS Lambda function
-* You need to have AWS credentials in `~/.aws/credentials`
-file with following content:
+
+## Подготовка работающей модели к загрузке на AWS Lambda
+### Настройка окружения
+* Необходимо создать файл `credentials` (без расширения) в директории `~/.aws`
+со следующим содержимым:
+    ```
+    [default] ; default profile
+    aws_access_key_id = <...>
+    aws_secret_access_key = <...>
+    ```
+    Ключи можно найти в нашем чате или создать новые [тут.](https://console.aws.amazon.com/iam/home#/security_credentials)
+* Необходимо установить [node.js](https://nodejs.org/en/)
+* Необходимо установить `gulp` с глобальным флагом при помощи команды `npm i gulp -g`
+* Необходимо установить локальным зависимости командой `npm i`, находясь в текущей директории.
+* Необходимо установить Docker (https://www.docker.com/products/docker-desktop)
+
+### Подготовка исходников
+Можно ориентироваться на то, как выглядит проект в [этой ветке](https://github.com/selivanov-as/ml-text-highlights/tree/deployment/tf-idf),
+то есть: скомпилированные зависимости под AWS, "чистый" репозиторий без других файлов, отдельная ветка.
+Обработчик, который будет вызывать Lambda при тригерах: `"main.handler"`. 
+Это значит, что вызывается функция `handler` lambda_src/main.py. 
+Это поведение можно менять в настройках функции в `gulpfile`, если в этом есть необходимость.
+Пошаговое руководство выглядит так:
+* Вынести исходный код из своих моделей в main.py файл в функцию `handler`. Работа этой функции
+должна заключаться в принятии входных параметров из объекта запроса, обработки информации
+при помощи модели и возврата ответа. Следует обратить внимание, что функция параметры
+из поля `texts`, т.е. плагин должен упаковывать список нод в массив, который и будет 
+содержаться внутри поля `texts`. Например, корректным **запросом** будет такой запрос:
+(_Content-Type: application/json_)
 ```
-[default] ; default profile
-aws_access_key_id = <...>
-aws_secret_access_key = <...>
+{
+  "texts": [
+    {
+      "text": "Здравствуйте, Kirill Bulgakov,",
+      "tag": "P"
+    },
+    {
+      "text": "\n    Мы обратили внимание, что Вы еще не активировали Вашу Предоплаченную Дебетовую Карту Payoneer MasterCard® и хотели\n    бы\n    убедиться в том, что Вы получили ее. Если Вы еще не получили Вашу карту, пожалуйста, посетите Центр Поддержки для\n    получения дополнительной информации.\n    Если Вы уже получили Вашу карту, Вы можете войти в Ваш аккаунт Payoneer, активировать ее и начать получать выплаты.\n",
+      "tag": "P"
+    },
+    {
+      "text": "Для получения дополнительной информации относительно доставки карт, пожалуйста, прочитайте эту статью в блоге\n    Payoneer.\n    Спасибо,\n    Коллектив Payoneer\n",
+      "tag": "P"
+    }
+  ]
+}
 ```
+* Все функции и другие файлы, используемые в модели, должны быть также перенесены в lambda_src, 
+так как именно эта директория затем будет упаковываться в архив.
+* Необходимо удостовериться, что `./venv` создан и в нем на данный момент не находятся никакие
+установленные зависимости (т.к. они могут быть скомпилированы в окружении, которое не совпадает 
+с тем, в котором код исполняется на Lambda), а в requirements находится актуальный список зависимостей.
+Желательно лишние зависимости удалять, чтобы не превысить лимиты на объем загружаемого контейнера.
+* Компилируем зависимости под окружение AWS:
+`docker run -it -v $PWD:/var/task lambci/lambda:build-python3.7 bash`
+`source ./venv/bin/activate`
+`pip install -r requirements.txt`
+* Теперь модель полностью готова к деплою на AWS Lambda. venv с зависимостями
+предлагается заливать прямо в репозиторий, чтобы не приходилось компилировать их
+заново.
 
-This information could be found [here.](https://console.aws.amazon.com/iam/home#/security_credentials)
-
-* Configure these params in `gulpfile.js` (lines 43-52):
-Don't forget to change name and insert correct Lambda ID
+### Настройка параметров AWS Lambda функции
+* Параметры Lambda функции настраиваются в `gulpfile.js` (линии 43-52):
+Если использовать **имя уже существующей функции**, ее перезапишет исходниками новой, 
+поэтому следует быть аккуратным.
 ```
 const params = {
     name: "<Your function name>",
@@ -99,9 +126,3 @@ const options = {
     region: "eu-west-1"
 };
 ```
-
-* Install `gulp` globally with `npm i gulp -g` command (you need to have `npm` installed on your machine)
-
-* Install all required node modules locally with `npm i` command  
-
-* Enter `gulp` command and wait until your sources will be deployed to AWS Lambda ()
