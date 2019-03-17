@@ -13,6 +13,7 @@ from flask import Flask, request
 from gensim.summarization import keywords, summarize
 
 from entity_finder import find_entities
+from sumy_smr import sum_sents
 
 
 THR = 0.25
@@ -214,3 +215,41 @@ def gensim_sentences():
 
     grouped_spans = joined_spans_to_grouped_spans(spans, texts, dlm, joined)
     return json.dumps(grouped_spans)
+
+
+METHODS = {
+    'lsa',
+    'lexrank',
+    'kl', # долго, остальные ок
+    'luhn',
+    'sumbasic',
+    'textrank',
+}
+
+
+
+@app.route('/sumy', methods=['POST'])
+def sumy_summarize():
+    inp = json.loads(request.data)
+
+    texts = [x['text'] for x in inp]
+    dlm = ''
+    joined = dlm.join(texts)
+
+    sentences = sum_sents(joined, ratio=0.2, method='luhn')
+
+    cur_start = 0
+    spans = []
+    for sent in sentences:
+        beg = joined.find(sent, cur_start)
+        if beg == -1:
+            print('====Not Found!!!====')
+            print(repr(sent))
+            print(repr(joined[cur_start : cur_start + 100]))
+            continue
+        cur_start = end = beg + len(sent)
+        spans.append((beg, end))
+
+    grouped_spans = joined_spans_to_grouped_spans(spans, texts, dlm, joined)
+    return json.dumps(grouped_spans)
+

@@ -1,5 +1,5 @@
 const highlight = `
-    var server_addr = 'http://127.0.0.1:5000/gensim_sentences';
+    var server_addr = 'http://127.0.0.1:5000/sumy';
     // var server_addr = "https://gx5gopdt8h.execute-api.eu-west-1.amazonaws.com/default/highlights_word_embeddings";
     var rus_or_dig = /[а-яё0-9]/i;
     var ignored_tags = new Set(["SCRIPT", "STYLE"]);
