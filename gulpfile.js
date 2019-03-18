@@ -13,6 +13,7 @@ const path = {
     pymorphy_dicts_lib: "./venv/lib/python3.7/site-packages/pymorphy2_dicts/**/*.*",
     dawg_python_lib: "./venv/lib/python3.7/site-packages/dawg_python/**/*.*",
     nltk_lib: "./venv/lib/python3.7/site-packages/nltk/**/*.*",
+    dependencies_src: "./venv/lib/python3.6/site-packages/**/*.*",
     dist_sources: "./dist/**/*.*"
 };
 
@@ -52,6 +53,11 @@ gulp.task("sources", _ =>
         .pipe(gulp.dest(path.dist_folder))
 );
 
+gulp.task("dependencies", _ =>
+    gulp.src(path.dependencies_src)
+        .pipe(gulp.dest(path.dist_folder))
+);
+
 gulp.task("zip", _ =>
     gulp.src(path.dist_sources)
         .pipe(zip(path.zip_dist_file))
@@ -60,8 +66,8 @@ gulp.task("zip", _ =>
 
 const params = {
     name: "Highlights-gensim_keywords",
-    role: "arn:aws:iam::701551728765:role/service-role/defaultRole",
-    runtime: "python3.7",
+    role: "arn:aws:iam::632759214929:role/service-role/defaultRole",
+    runtime: "python3.6",
     handler: "main.handler"
 };
 
@@ -79,7 +85,7 @@ gulp.task("upload", cb =>
 gulp.task('default',
     gulp.series(
         ["clean"],
-        ["pymorphy2", "dawg_python", "nltk", "pymorphy2_dicts", "sources"],
+        ["dependencies", "sources"],
         ['zip'],
         ['upload'],
         done => done()
