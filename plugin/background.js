@@ -1,5 +1,5 @@
 const highlight = `
-    var server_addr = 'http://127.0.0.1:5000/sumy';
+    var server_addr = 'http://127.0.0.1:5000/gensim_sentences';
     // var server_addr = "https://gx5gopdt8h.execute-api.eu-west-1.amazonaws.com/default/highlights_word_embeddings";
     var rus_or_dig = /[а-яё0-9]/i;
     var ignored_tags = new Set(["SCRIPT", "STYLE"]);
@@ -36,12 +36,12 @@ const highlight = `
     }
 
     spans = [];
-    /*var data = JSON.stringify({texts}); //creates object with list inside 'texts' field
+    var data = JSON.stringify({texts}); //creates object with list inside 'texts' field
 
     axios.post(server_addr, data, {headers: {
         'Content-Type': 'application/json'}
-    }).then(*/
-    axios.post(server_addr, texts).then(
+    }).then(
+    //axios.post(server_addr, texts).then(
         function (response) {
             spans = response.data;
             for (var i = 0; i < good_nodes.length; i++) {
