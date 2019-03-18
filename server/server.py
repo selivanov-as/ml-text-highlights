@@ -11,9 +11,9 @@ from pprint import pprint
 import pymorphy2
 from flask import Flask, request
 
-import matplotlib.pyplot as plt
-from entity_finder import find_entities
-from rus_preprocessing_mystem import (tag_mystem, mystem2upos)
+# import matplotlib.pyplot as plt
+# from entity_finder import find_entities
+# from rus_preprocessing_mystem import (tag_mystem, mystem2upos)
 
 
 THR = 0.25
@@ -254,13 +254,13 @@ def handleTF_IDF():
     return json.dumps(sorted_tfidfs_to_spans(sorted_tfidfs, input, gr_words))
 
 
-DEBUG_PRINT = True
+DEBUG_PRINT = False
 USE_TFIDF_W2V_PRODUCT = True
 
 
 @app.route('/w2v', methods=['POST'])
 def highlight_with_w2v_norm():
-    inp = json.loads(request.data)
+    inp = json.loads(request.data)['texts']
 
     tokens, normalized_tokens = tokenize_lemmatize_input(inp, lem=LEMMR)
 
