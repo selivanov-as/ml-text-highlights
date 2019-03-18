@@ -59,7 +59,7 @@ gulp.task("zip", _ =>
 );
 
 const params = {
-    name: "Highlights",
+    name: "Highlights-gensim_keywords",
     role: "arn:aws:iam::701551728765:role/service-role/defaultRole",
     runtime: "python3.7",
     handler: "main.handler"
