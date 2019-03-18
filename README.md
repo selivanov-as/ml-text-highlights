@@ -103,9 +103,12 @@ http://www.machinelearning.ru/wiki/images/7/7e/Mel_lain_msu_nlp_sem_5.pdf
 с тем, в котором код исполняется на Lambda), а в requirements находится актуальный список зависимостей.
 Желательно лишние зависимости удалять, чтобы не превысить лимиты на объем загружаемого контейнера.
 * Компилируем зависимости под окружение AWS:
-`docker run -it -v $PWD:/var/task lambci/lambda:build-python3.7 bash`
+`docker run -it -v $PWD:/var/task lambci/lambda:build-python3.6 bash`
+
 `source ./venv/bin/activate`
+
 `pip install -r requirements.txt`
+
 * Теперь модель полностью готова к деплою на AWS Lambda. venv с зависимостями
 предлагается заливать прямо в репозиторий, чтобы не приходилось компилировать их
 заново.
