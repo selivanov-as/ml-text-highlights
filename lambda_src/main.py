@@ -2,6 +2,7 @@ import string
 import pymorphy2
 import json
 import itertools
+import base64
 
 morph = pymorphy2.MorphAnalyzer()
 
@@ -97,9 +98,9 @@ def choose_n_important(sorted_pairs, min_share=0.05, max_share=0.4):
 
 
 def handler(event, context):
-    inp = json.loads(event["body"])['texts']
+    inp = json.loads(base64.b64decode(event["body"]).decode('utf-8'))['texts']
 
-    tokens, normalized_tokens = tokenize_lemmatize_input(inp["texts"])
+    tokens, normalized_tokens = tokenize_lemmatize_input(inp)
 
     norms = {normalized_token: (vector_norms.get(normalized_token,
                                                  float('-inf')),)
