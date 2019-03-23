@@ -1,7 +1,16 @@
+import base64
 import json
 import re
+import time
 
 from gensim.summarization import keywords
+
+import logging
+
+script_start = time.time()
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
+logger.info('script starts now')
 
 
 def joined_spans_to_grouped_spans(spans, texts, dlm, joined):
@@ -35,7 +44,9 @@ def joined_spans_to_grouped_spans(spans, texts, dlm, joined):
 
 
 def handler(event, context):
-    inp = json.loads(event["body"])['texts']
+    func_start = time.time()
+    logger.info('starting...')
+    inp = json.loads(base64.b64decode(event["body"]).decode('utf-8'))['texts']
 
     texts = [x['text'] for x in inp]
 
@@ -56,6 +67,10 @@ def handler(event, context):
 
     grouped_spans = joined_spans_to_grouped_spans(spans, texts, dlm, joined)
 
+    logger.info('handling took %.3f' % (time.time() - func_start))
+    logger.info(
+        'time elapsed from script start: %.3f' % (time.time() - script_start)
+    )
     return {
         'statusCode': 200,
         'headers': {'Content-Type': 'application/json'},
