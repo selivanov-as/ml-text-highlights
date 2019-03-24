@@ -56,6 +56,6 @@ def handler(event, context):
 
     return {
         'statusCode': 200,
-        'headers': {'Content-Type': 'application/json'},
+        'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
         'body': json.dumps(sorted_tfidfs_to_spans(sorted_tfidfs, body["texts"]))
     }
