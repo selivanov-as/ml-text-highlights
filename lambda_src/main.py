@@ -47,8 +47,17 @@ def sorted_tfidfs_to_spans(sorted_tfidfs, input):
 
 
 def handler(event, context):
-    body = json.loads(base64.b64decode(event["body"]).decode('utf-8'))
-    # body = json.loads(event["body"])
+    if event['httpMethod'] == 'OPTIONS':
+        return {
+            'statusCode': 200,
+            'headers': {
+                'Access-Control-Allow-Origin': '*',
+                'Access-Control-Allow-Credentials': True,
+                'Access-Control-Allow-Headers': 'Content-Type'
+            }
+        }
+
+    body = json.loads(event["body"])
 
     words = input_to_words(body["texts"])
     results = tf_idf_normalized(words)
@@ -56,6 +65,9 @@ def handler(event, context):
 
     return {
         'statusCode': 200,
-        'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+        'headers': {'Content-Type': 'application/json',
+                    'Access-Control-Allow-Origin': '*',
+                    'Access-Control-Allow-Headers': 'Content-Type'
+                    },
         'body': json.dumps(sorted_tfidfs_to_spans(sorted_tfidfs, body["texts"]))
     }
