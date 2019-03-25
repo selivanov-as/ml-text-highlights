@@ -85,8 +85,8 @@ gulp.task("upload", cb =>
 
 gulp.task('default',
     gulp.series(
-        //["clean"],
-        //["dependencies", "sources"],
+        ["clean"],
+        ["dependencies", "sources"],
         ['zip'],
         ['upload'],
         done => done()
