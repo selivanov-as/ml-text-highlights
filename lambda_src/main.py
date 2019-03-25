@@ -127,6 +127,17 @@ def choose_n_important(sorted_pairs, min_share=0.05, max_share=0.4):
 def handler(event, context):
     func_start = time.time()
     logger.info('starting...')
+
+    if event['httpMethod'] == 'OPTIONS':
+        return {
+            'statusCode': 200,
+            'headers': {
+                'Access-Control-Allow-Origin': '*',
+                'Access-Control-Allow-Credentials': True,
+                'Access-Control-Allow-Headers': 'Content-Type'
+            }
+        }
+
     inp = json.loads(event["body"])['texts']
 
     tokens, normalized_tokens = tokenize_lemmatize_input(inp, lem=LEMMR)
@@ -172,11 +183,16 @@ def handler(event, context):
             use_normalised=True, grouped_norm_words=normalized_tokens,
             important_norm_words=important_normalized_tokens)
 
-    
+
     logger.info('handling took %.3f' % (time.time() - func_start))
     logger.info('time elapsed from script start: %.3f' % (time.time() - script_start))
     return {
         'statusCode': 200,
-        'headers': {'Content-Type': 'application/json'},
+        'headers': {
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Credentials': True,
+            'Access-Control-Allow-Headers': 'Content-Type'
+        },
         'body': json.dumps(spans)
     }
