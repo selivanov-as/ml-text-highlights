@@ -1,4 +1,3 @@
-import base64
 import json
 import time
 
@@ -43,9 +42,18 @@ def joined_spans_to_grouped_spans(spans, texts, dlm, joined):
 
 
 def handler(event, context):
+    if event['httpMethod'] == 'OPTIONS':
+        return {
+            'statusCode': 200,
+            'headers': {
+                'Access-Control-Allow-Origin': '*',
+                'Access-Control-Allow-Credentials': True,
+                'Access-Control-Allow-Headers': 'Content-Type'
+            }
+        }
     func_start = time.time()
     logger.info('starting...')
-    inp = json.loads(base64.b64decode(event["body"]).decode('utf-8'))['texts']
+    inp = json.loads(event["body"])['texts']
 
     texts = [x['text'] for x in inp]
     dlm = ''
