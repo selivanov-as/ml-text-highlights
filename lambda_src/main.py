@@ -127,7 +127,7 @@ def choose_n_important(sorted_pairs, min_share=0.05, max_share=0.4):
 def handler(event, context):
     func_start = time.time()
     logger.info('starting...')
-    inp = json.loads(base64.b64decode(event["body"]).decode('utf-8'))['texts']
+    inp = json.loads(event["body"])['texts']
 
     tokens, normalized_tokens = tokenize_lemmatize_input(inp, lem=LEMMR)
 
