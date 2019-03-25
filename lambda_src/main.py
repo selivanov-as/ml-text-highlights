@@ -98,7 +98,17 @@ def choose_n_important(sorted_pairs, min_share=0.05, max_share=0.4):
 
 
 def handler(event, context):
-    inp = json.loads(base64.b64decode(event["body"]).decode('utf-8'))['texts']
+    if event['httpMethod'] == 'OPTIONS':
+        return {
+            'statusCode': 200,
+            'headers': {
+                'Access-Control-Allow-Origin': '*',
+                'Access-Control-Allow-Credentials': True,
+                'Access-Control-Allow-Headers': 'Content-Type'
+            }
+        }
+
+    inp = json.loads(event["body"])['texts']
 
     tokens, normalized_tokens = tokenize_lemmatize_input(inp)
 
@@ -131,6 +141,11 @@ def handler(event, context):
 
     return {
         'statusCode': 200,
-        'headers': {'Content-Type': 'application/json'},
+        'headers': {
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Credentials': True,
+            'Access-Control-Allow-Headers': 'Content-Type'
+        },
         'body': json.dumps(spans)
     }
