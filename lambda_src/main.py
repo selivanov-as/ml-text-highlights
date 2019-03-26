@@ -1,16 +1,6 @@
 import json
+import random
 import string
-import pymorphy2
-import operator
-import logging
-import base64
-
-logger = logging.getLogger()
-logger.setLevel(logging.INFO)
-
-from tf_idf_normalized import tf_idf_normalized
-
-morph = pymorphy2.MorphAnalyzer()
 
 PUNCTUATION = string.punctuation + "–—‒"
 
@@ -28,7 +18,7 @@ def input_to_words(input):
 
 def sorted_tfidfs_to_spans(sorted_tfidfs, input):
     n_important = int(len(sorted_tfidfs) * SHARE)
-    important_words = {tf_idf_info['word'] for tf_idf_info in sorted_tfidfs[:n_important]}
+    important_words = sorted_tfidfs[:n_important]
 
     grouped_spans = []
     for node in input:
@@ -60,8 +50,7 @@ def handler(event, context):
     body = json.loads(event["body"])
 
     words = input_to_words(body["texts"])
-    results = tf_idf_normalized(words)
-    sorted_tfidfs = sorted(results, key=lambda word: word['tf_idf'], reverse=True)
+    random.shuffle(words)
 
     return {
         'statusCode': 200,
@@ -69,5 +58,5 @@ def handler(event, context):
                     'Access-Control-Allow-Origin': '*',
                     'Access-Control-Allow-Headers': 'Content-Type'
                     },
-        'body': json.dumps(sorted_tfidfs_to_spans(sorted_tfidfs, body["texts"]))
+        'body': json.dumps(sorted_tfidfs_to_spans(words, body["texts"]))
     }
