@@ -1,6 +1,5 @@
 const highlight = `
     var server_addr = 'http://127.0.0.1:5000/tf-idf';
-    var rus_or_dig = /[а-яё0-9]/i;
     var ignored_tags = new Set(["SCRIPT", "STYLE"]);
     var endpoint_resolver_addr = "https://5bs06gpnr4.execute-api.eu-west-1.amazonaws.com/default/endpointResolver";
 
@@ -35,9 +34,6 @@ const highlight = `
             continue;
         }
         var text = node.innerText || node.textContent;
-        if (text.search(rus_or_dig) == -1) {
-            continue;
-        }
         good_nodes.push(node);
         texts.push({
             'text': text,
