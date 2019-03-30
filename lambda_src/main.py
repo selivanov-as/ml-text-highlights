@@ -56,7 +56,7 @@ def handler(event, context):
     inp = json.loads(event["body"])['texts']
 
     texts = [x['text'] for x in inp]
-    dlm = ''
+    dlm = ' '
     joined = dlm.join(texts)
 
     sentences = summarize(joined, ratio=0.2, split=True)
