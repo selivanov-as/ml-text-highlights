@@ -4,7 +4,7 @@ import string
 
 PUNCTUATION = string.punctuation + "–—‒"
 
-SHARE = 0.3
+SHARE = 0.2
 
 
 def input_to_words(input):
@@ -26,7 +26,7 @@ def sorted_tfidfs_to_spans(sorted_tfidfs, input):
         text = node['text']
         cur_spans = []
         for word in text.split():
-            if word.strip(PUNCTUATION) in important_words:
+            if word.strip(PUNCTUATION) and random.random() < SHARE: # in important_words:
                 beg = text.find(word, cur_pos)
                 cur_pos = end = beg + len(word)
                 cur_spans.append((beg, end))
