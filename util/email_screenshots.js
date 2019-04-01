@@ -164,7 +164,7 @@ const getScreenshotOfGivenEmail = async (emailNumber, driver) => {
 
 const main = async () => {
     const driver = new webdriver.Builder().forBrowser('chrome').build();
-    driver.manage().window().maximize();
+    driver.manage().window().setRect({width: 720, height: 5000})
     driver.manage().deleteAllCookies();
 
     for (let i = 1; i <= EMAILS_AMOUNT; i++)
