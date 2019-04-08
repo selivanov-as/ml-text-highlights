@@ -1,0 +1,12 @@
+breadability==0.1.20
+certifi==2019.3.9
+chardet==3.0.4
+docopt==0.6.2
+idna==2.8
+lxml==4.3.3
+nltk==3.4
+requests==2.21.0
+singledispatch==3.4.0.3
+six==1.12.0
+sumy==0.7.0
+urllib3==1.24.1
