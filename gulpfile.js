@@ -65,7 +65,7 @@ gulp.task("zip", _ =>
 );
 
 const params = {
-    name: "Highlights-random",
+    name: "Highlights-random_good",
     role: "arn:aws:iam::632759214929:role/service-role/defaultRole",
     runtime: "python3.6",
     handler: "main.handler"
