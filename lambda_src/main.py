@@ -1,18 +1,17 @@
-import itertools
 import json
-import operator
-import re
-import string
 import time
-import threading
-from collections import Counter
-from pprint import pprint
+import string
 
 from sumy_smr import sum_sents
 
+import logging
 
-THR = 0.25
-SHARE = 0.3
+script_start = time.time()
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
+logger.info('script starts now')
+
+
 PUNCTUATION = string.punctuation + ''.join([
     '–', '—', '‒', '−', '«', '»', '\xa0', '°', '′', '\u2009', '\u200e',
     '©', '®', '’', '…', '↑', '″', '”', '“', '•', '№',
@@ -59,11 +58,21 @@ METHODS = {
 }
 
 def handler(event, context):
-    body = json.loads(event["body"])
-    inp = json.loads(request.data)['texts']
+    if event['httpMethod'] == 'OPTIONS':
+        return {
+            'statusCode': 200,
+            'headers': {
+                'Access-Control-Allow-Origin': '*',
+                'Access-Control-Allow-Credentials': True,
+                'Access-Control-Allow-Headers': 'Content-Type'
+            }
+        }
+    func_start = time.time()
+    logger.info('starting...')
+    inp = json.loads(event["body"])['texts']
 
     texts = [x['text'] for x in inp]
-    dlm = ''
+    dlm = ' '
     joined = dlm.join(texts)
 
     sentences = sum_sents(joined, ratio=0.2, method='lsa')
@@ -73,13 +82,21 @@ def handler(event, context):
     for sent in sentences:
         beg = joined.find(sent, cur_start)
         if beg == -1:
-            print('====Not Found!!!====')
-            print(repr(sent))
-            print(repr(joined[cur_start : cur_start + 100]))
+            # print('====Not Found!!!====')
+            # print(repr(sent))
+            # print(repr(joined[cur_start : cur_start + 100]))
             continue
         cur_start = end = beg + len(sent)
         spans.append((beg, end))
 
     grouped_spans = joined_spans_to_grouped_spans(spans, texts, dlm, joined)
-    return json.dumps(grouped_spans)
 
+    logger.info('handling took %.3f' % (time.time() - func_start))
+    logger.info(
+        'time elapsed from script start: %.3f' % (time.time() - script_start)
+    )
+    return {
+        'statusCode': 200,
+        'headers': {'Content-Type': 'application/json'},
+        'body': json.dumps(grouped_spans)
+    }
