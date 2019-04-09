@@ -4,7 +4,7 @@ import os
 screenshots_folder = '../screenshot_emails/'
 prefix = 'highlightdisk/screenshot_emails/'  # proxy and folder in yadisk
 files = os.listdir(screenshots_folder + 'random')
-pairs = [('embeddings', 'gensim_sentences')] #, ('tf_idf_embeddings', 'tf_idf_custom'), 'gensim_keywords']
+pairs = [('random_good', 'gensim_sentences')] #, ('tf_idf_embeddings', 'tf_idf_custom'), 'gensim_keywords', 'embeddings']
 
 honeypot_algs = ['embeddings', 'gensim_sentences',
         'tf_idf_embeddings', 'tf_idf_custom', 'gensim_keywords']
