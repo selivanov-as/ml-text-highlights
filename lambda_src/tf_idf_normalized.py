@@ -7,7 +7,7 @@ sys.modules["sqlite3.dbapi2"] = imp.new_module("sqlite.dbapi2")
 from nltk import RegexpParser
 from percentile import percentile
 
-with open('./normalized_idf.json') as f:
+with open('./wiki_df.json') as f:
     normalised_idf = json.loads(f.read())
 
 with open("./stopwords.txt") as f:
