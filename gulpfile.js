@@ -13,8 +13,9 @@ const path = {
     pymorphy_dicts_lib: "./venv/lib/python3.7/site-packages/pymorphy2_dicts/**/*.*",
     dawg_python_lib: "./venv/lib/python3.7/site-packages/dawg_python/**/*.*",
     nltk_lib: "./venv/lib/python3.7/site-packages/nltk/**/*.*",
-    dependencies_src: "./venv/lib/python3.6/site-packages/**/*.*",
-    dist_sources: "./dist/**/*.*"
+    dependencies_src: ["./venv/lib/python3.6/site-packages/**/*.*",
+                       "./venv/lib/python3.6/site-packages/**/.*/**/*.*"],
+    dist_sources: ["./dist/**/*.*", "./dist/**/.*/**/*.*"]
 };
 
 gulp.task("clean", cb =>
