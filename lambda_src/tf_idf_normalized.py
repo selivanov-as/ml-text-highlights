@@ -59,7 +59,8 @@ def create_tf_idf_info(result, words, normalized_words, included_tf_idf_values):
                 'normal_form': word_in_normal_form,
                 'tf': normalized_words.count(word_in_normal_form),
                 'doc_length': doc_length,
-                'idf': word_normal_form_idf
+                # It's possible to set any real value because It will not affect on anything
+                'idf': 1
             }
             result.append(tf_idf_info)
 
