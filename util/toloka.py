@@ -1,4 +1,5 @@
 import argparse
+import datetime
 import json
 import sys
 from itertools import zip_longest
@@ -20,7 +21,7 @@ cache = {}
 def get_args():
     parser = argparse.ArgumentParser(description='Process some integers.', usage='<command> <OAuth_token> <Pool_ID>')
     parser.add_argument('command', type=str,
-                        help='Which command to perform', choices=['consistency', 'pair-statistic'])
+                        help='Which command to perform', choices=['check', 'pair-statistic'])
     parser.add_argument('OAuth_token', type=str,
                         help='OAuth token could be found here: https://toloka.yandex.ru/requester/profile/integration')
     parser.add_argument('Pool_ID',
@@ -80,7 +81,7 @@ def get_pair_statistic(args):
 
 def make_df(args):
     if 'df' in cache:
-        return cache['df']
+        return
     if 'body' not in cache:
         cache['body'] = make_request(args)
     body = cache['body']
@@ -105,7 +106,8 @@ def make_df(args):
                 cur_vals['golden'] = np.nan
             cur_vals['task_id'] = task['id']
             del cur_vals['id']
-            for opt_key in ['overlap', 'submitted', 'expired']:
+            for opt_key in ['overlap', 'submitted', 'expired',
+                            'public_comment', 'accepted']:
                 cur_vals[opt_key] = cur_vals.get(opt_key, np.nan)
             cur_vals['solution'] = solution['output_values']['result'] if solution else np.nan
             cur_vals.update(common)
@@ -157,13 +159,41 @@ def save_dataframe(args):
     df.to_csv(f'pool_{args.Pool_ID}_results.csv')
 
 
-def check_consistency(args):
+def send_evaluations(args):
     if 'df' not in cache:
         make_df(args)
     df = cache['df']
-    user_algs_task_aggregation = df[df.golden.isna()].groupby(
-        by=['user_id', 'algs', 'task']
-    )['chosen_alg'].aggregate(['count', 'nunique'])
+    for iid in df.groupby('id')['id'].max():
+        message = {
+          "status": "ACCEPTED",
+          "public_comment": "Принято!"
+        }
+        #     message = {
+        #       "status": "REJECTED",
+        #       "public_comment": "Отклонено из-за непоследовательности в оценках. "
+        #                         "Для одной и той же пары картинок были даны противоположные ответы."
+        #     }
+        body = json.dumps(message)
+        response = requests.patch(
+            f'https://toloka.yandex.ru/api/v1/assignments/{iid}',
+            data=body,
+            headers={'Authorization': f'OAuth {args.OAuth_token}',
+                     'Content-Type': 'application/json'})
+        if (response.status_code != 200
+                and json.loads(
+                    response._content
+                )['code'] != 'INAPPROPRIATE_STATUS'):
+            print('unsuccessful patch request:',
+                  response.__dict__, sep='\n')
+            exit(1)
+
+
+def check_answers(args,
+                  min_consistency_checks_showed=1, min_inconsistent_share=0.2,
+                  min_honeypot_showed=3, min_honeypot_wrong_share=0.35):
+    if 'df' not in cache:
+        make_df(args)
+    df = cache['df']
     user_algs_task_aggregation = df[df.golden.isna()].groupby(
         by=['user_id', 'algs', 'task']
     )['chosen_alg'].agg({'n_showed': 'count', 'different_answers': 'nunique'})
@@ -174,31 +204,81 @@ def check_consistency(args):
         user_algs_task_aggregation.n_showed > 1]
     user_algs_task_aggregation['consistent'] = user_algs_task_aggregation[
                                               'different_answers'] == 1
-    inconsistent = user_algs_task_aggregation[
-        user_algs_task_aggregation.consistent != True]
-    inconsistent_item_ids = set(iid
-                                for line in inconsistent['item_ids']
-                                for iid in line)
-    for iid in df.groupby('id')['id'].max():
-        if iid not in inconsistent_item_ids:
-            message = {
-              "status": "ACCEPTED",
-              "public_comment": "Принято!"
-            }
-        else:
-            message = {
-              "status": "REJECTED",
-              "public_comment": "Отклонено из-за непоследовательности в оценках. "
-                                "Для одной и той же пары картинок были даны противоположные ответы."
-            }
-        print(message)
+
+    # inconsistent = user_algs_task_aggregation[
+    #     user_algs_task_aggregation.consistent != True]
+    # inconsistent_item_ids = set(iid
+    #                             for line in inconsistent['item_ids']
+    #                             for iid in line)
+
+    user_aggregation = user_algs_task_aggregation.groupby(by='user_id')[
+        'consistent'].agg(['count', 'sum'])  # n_task_checked, n_tasks_passed
+    # share_of_tasks_failed:
+    user_aggregation['inconsistent_share'] = (
+            1 - user_aggregation['sum'] / user_aggregation['count'])
+    inconsistent_users = set(
+        user_aggregation[
+            (user_aggregation['inconsistent_share'] > min_inconsistent_share)
+            & (user_aggregation['count'] >= min_consistency_checks_showed)
+        ].index)
+    df['by_inconsistency_blocked_user'] = df.user_id.apply(
+        lambda uid: uid in inconsistent_users)
+
+    df['honeypotted'] = (df.chosen_alg == 'random')
+    honeypot_user_aggregation = df[~df.golden.isna()].groupby('user_id')[
+        'honeypotted'].agg({'n_showed': 'count', 'n_wrong': 'sum'})
+    honeypot_user_aggregation[
+        'wrong_share'
+    ] = honeypot_user_aggregation.n_wrong / honeypot_user_aggregation.n_showed
+
+    honeypotted_users = set(
+        honeypot_user_aggregation[
+            (honeypot_user_aggregation.wrong_share > min_honeypot_wrong_share)
+            & (honeypot_user_aggregation.n_showed >= min_honeypot_showed)
+        ].index)
+    df['by_honeypot_blocked_user'] = df.user_id.apply(
+        lambda uid: uid in honeypotted_users)
+
+    blockdays = 60
+    for uid in inconsistent_users:
+        message = {
+            "scope": "PROJECT",
+            "user_id": uid,
+            "project_id": "20359",
+            "private_comment": "Непоследовательность",
+            "will_expire": (
+                    datetime.datetime.now() + datetime.timedelta(blockdays)
+            ).strftime("%Y-%m-%dT%H:%M:%S")
+        }
         body = json.dumps(message)
-        response = requests.patch(
-            f'https://toloka.yandex.ru/api/v1/assignments/{iid}',
+        response = requests.put(
+            'https://toloka.yandex.ru/api/v1/user-restrictions',
             data=body,
-            headers={'Authorization': f'OAuth {args.OAuth_token}'})
+            headers={'Authorization': f'OAuth {args.OAuth_token}',
+                     'Content-Type': 'application/json'})
+        if response.status_code not in [200, 201]:
+            print('unsuccessful put request:',
+                  response.__dict__, sep='\n')
+            exit(1)
+
+    for uid in honeypotted_users - inconsistent_users:
+        message = {
+            "scope": "PROJECT",
+            "user_id": uid,
+            "project_id": "20359",
+            "private_comment": "ханипот (постобработка)",
+            "will_expire": (
+                    datetime.datetime.now() + datetime.timedelta(blockdays)
+            ).strftime("%Y-%m-%dT%H:%M:%S")
+        }
+        body = json.dumps(message)
+        response = requests.put(
+            'https://toloka.yandex.ru/api/v1/user-restrictions',
+            data=body,
+            headers={'Authorization': f'OAuth {args.OAuth_token}',
+                     'Content-Type': 'application/json'})
         if response.status_code != 200:
-            print('unsuccessful_request:',
+            print('unsuccessful put request:',
                   response.__dict__, sep='\n')
             exit(1)
 
@@ -208,9 +288,10 @@ def main():
 
     if args.command == 'pair-statistic':
         get_pair_statistic(args)
-    if args.command == 'consistency':
-        check_consistency(args)
+    if args.command == 'check':
+        check_answers(args)
     save_dataframe(args)
+    send_evaluations(args)
 
 
 if __name__ == '__main__':
