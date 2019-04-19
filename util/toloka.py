@@ -8,31 +8,50 @@ import numpy as np
 import pandas as pd
 import requests
 
-# Returns a namespace:
-#
-# Namespace(
-# OAuth_token=<>,
-# Pool_ID=<>,
-# command=<>
-# )
-
 cache = {}
 
 def get_args():
-    parser = argparse.ArgumentParser(description='Process some integers.', usage='<command> <OAuth_token> <Pool_ID>')
-    parser.add_argument('command', type=str,
-                        help='Which command to perform', choices=['check', 'pair-statistic'])
-    parser.add_argument('OAuth_token', type=str,
-                        help='OAuth token could be found here: https://toloka.yandex.ru/requester/profile/integration')
-    parser.add_argument('Pool_ID',
-                        help='Pool ID. Could be found in URL when you\'re on pool page')
+    parser = argparse.ArgumentParser(description='Process some integers.',
+                                     usage='<command> <OAuth_token> <Pool_ID>')
+    parser.add_argument(
+        'OAuth_token', type=str,
+        help='OAuth token could be found here: '
+             'https://toloka.yandex.ru/requester/profile/integration')
+    parser.add_argument(
+        'Pool_ID',
+        help='Pool ID. Could be found in URL when you\'re on pool page')
+    parser.add_argument(
+        '-s', '--pair-statistic',
+        help='Print statistics for tasks',
+        action='store_true')
+    parser.add_argument(
+        '-c', '--check',
+        help='Check users for consistency and honeypot '
+             'performance and store results in dataframe',
+        action='store_true')
+    parser.add_argument(
+        '-e', '--send-evals',
+        help='Send approvals as delayed evaluation',
+        action='store_true')
+    parser.add_argument(
+        '-b', '--send-blocks',
+        help='Check users for consistency and honeypot performance, '
+             'store results in dataframe '
+             'and block inconsistent and honeypotted users via toloka API',
+        action='store_true')
+    parser.add_argument(
+        '-p', '--path',
+        type=str,
+        help='dataframe saving path, default is ./pool_{Pool_ID}_results.csv'
+    )
 
     return parser.parse_args()
 
 
 def make_request(args):
-    response = requests.get(f'https://toloka.yandex.ru/api/v1/assignments?pool_id={args.Pool_ID}&limit=100',
-                            headers={'Authorization': f'OAuth {args.OAuth_token}'})
+    response = requests.get(
+        f'https://toloka.yandex.ru/api/v1/assignments?pool_id={args.Pool_ID}&limit=10000',
+        headers={'Authorization': f'OAuth {args.OAuth_token}'})
     if response.status_code != 200:
         print(f'Got {response.status_code} code')
         exit(1)
@@ -156,7 +175,8 @@ def save_dataframe(args):
     if 'df' not in cache:
         make_df(args)
     df = cache['df']
-    df.to_csv(f'pool_{args.Pool_ID}_results.csv')
+    path = args.path or f'pool_{args.Pool_ID}_results.csv'
+    df.to_csv(path)
 
 
 def send_evaluations(args):
@@ -168,11 +188,6 @@ def send_evaluations(args):
           "status": "ACCEPTED",
           "public_comment": "Принято!"
         }
-        #     message = {
-        #       "status": "REJECTED",
-        #       "public_comment": "Отклонено из-за непоследовательности в оценках. "
-        #                         "Для одной и той же пары картинок были даны противоположные ответы."
-        #     }
         body = json.dumps(message)
         response = requests.patch(
             f'https://toloka.yandex.ru/api/v1/assignments/{iid}',
@@ -189,8 +204,8 @@ def send_evaluations(args):
 
 
 def check_answers(args,
-                  min_consistency_checks_showed=1, min_inconsistent_share=0.2,
-                  min_honeypot_showed=3, min_honeypot_wrong_share=0.35):
+                  min_consistency_checks_showed=1, min_inconsistent_share=0.4,
+                  min_honeypot_showed=3, min_honeypot_wrong_share=0.4):
     if 'df' not in cache:
         make_df(args)
     df = cache['df']
@@ -239,59 +254,61 @@ def check_answers(args,
     df['by_honeypot_blocked_user'] = df.user_id.apply(
         lambda uid: uid in honeypotted_users)
 
-    blockdays = 60
-    for uid in inconsistent_users:
-        message = {
-            "scope": "PROJECT",
-            "user_id": uid,
-            "project_id": "20359",
-            "private_comment": "Непоследовательность",
-            "will_expire": (
-                    datetime.datetime.now() + datetime.timedelta(blockdays)
-            ).strftime("%Y-%m-%dT%H:%M:%S")
-        }
-        body = json.dumps(message)
-        response = requests.put(
-            'https://toloka.yandex.ru/api/v1/user-restrictions',
-            data=body,
-            headers={'Authorization': f'OAuth {args.OAuth_token}',
-                     'Content-Type': 'application/json'})
-        if response.status_code not in [200, 201]:
-            print('unsuccessful put request:',
-                  response.__dict__, sep='\n')
-            exit(1)
+    if args.send_blocks:
+        blockdays = 60
+        for uid in inconsistent_users:
+            message = {
+                "scope": "PROJECT",
+                "user_id": uid,
+                "project_id": "20359",
+                "private_comment": "Непоследовательность",
+                "will_expire": (
+                        datetime.datetime.now() + datetime.timedelta(blockdays)
+                ).strftime("%Y-%m-%dT%H:%M:%S")
+            }
+            body = json.dumps(message)
+            response = requests.put(
+                'https://toloka.yandex.ru/api/v1/user-restrictions',
+                data=body,
+                headers={'Authorization': f'OAuth {args.OAuth_token}',
+                         'Content-Type': 'application/json'})
+            if response.status_code not in [200, 201]:
+                print('unsuccessful put request:',
+                      response.__dict__, sep='\n')
+                exit(1)
 
-    for uid in honeypotted_users - inconsistent_users:
-        message = {
-            "scope": "PROJECT",
-            "user_id": uid,
-            "project_id": "20359",
-            "private_comment": "ханипот (постобработка)",
-            "will_expire": (
-                    datetime.datetime.now() + datetime.timedelta(blockdays)
-            ).strftime("%Y-%m-%dT%H:%M:%S")
-        }
-        body = json.dumps(message)
-        response = requests.put(
-            'https://toloka.yandex.ru/api/v1/user-restrictions',
-            data=body,
-            headers={'Authorization': f'OAuth {args.OAuth_token}',
-                     'Content-Type': 'application/json'})
-        if response.status_code != 200:
-            print('unsuccessful put request:',
-                  response.__dict__, sep='\n')
-            exit(1)
+        for uid in honeypotted_users - inconsistent_users:
+            message = {
+                "scope": "PROJECT",
+                "user_id": uid,
+                "project_id": "20359",
+                "private_comment": "ханипот (постобработка)",
+                "will_expire": (
+                        datetime.datetime.now() + datetime.timedelta(blockdays)
+                ).strftime("%Y-%m-%dT%H:%M:%S")
+            }
+            body = json.dumps(message)
+            response = requests.put(
+                'https://toloka.yandex.ru/api/v1/user-restrictions',
+                data=body,
+                headers={'Authorization': f'OAuth {args.OAuth_token}',
+                         'Content-Type': 'application/json'})
+            if response.status_code != 200:
+                print('unsuccessful put request:',
+                      response.__dict__, sep='\n')
+                exit(1)
 
 
 def main():
     args = get_args()
 
-    if args.command == 'pair-statistic':
+    if args.pair_statistic:
         get_pair_statistic(args)
-    if args.command == 'check':
+    if args.check or args.send_blocks:
         check_answers(args)
     save_dataframe(args)
-    send_evaluations(args)
+    if args.send_evals:
+        send_evaluations(args)
 
 
 if __name__ == '__main__':
