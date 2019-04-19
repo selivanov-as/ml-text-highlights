@@ -1,0 +1,51 @@
+INPUT:image_left	INPUT:image_right	GOLDEN:result	HINT:text
+highlightdisk/screenshot_emails/random_good/letter1.png	highlightdisk/screenshot_emails/tf_idf_custom/letter1.png		
+highlightdisk/screenshot_emails/tf_idf_custom/letter1.png	highlightdisk/screenshot_emails/random_good/letter1.png		
+highlightdisk/screenshot_emails/random_good/letter10.png	highlightdisk/screenshot_emails/tf_idf_custom/letter10.png		
+highlightdisk/screenshot_emails/tf_idf_custom/letter10.png	highlightdisk/screenshot_emails/random_good/letter10.png		
+highlightdisk/screenshot_emails/random_good/letter11.png	highlightdisk/screenshot_emails/tf_idf_custom/letter11.png		
+highlightdisk/screenshot_emails/tf_idf_custom/letter11.png	highlightdisk/screenshot_emails/random_good/letter11.png		
+highlightdisk/screenshot_emails/random_good/letter12.png	highlightdisk/screenshot_emails/tf_idf_custom/letter12.png		
+highlightdisk/screenshot_emails/tf_idf_custom/letter12.png	highlightdisk/screenshot_emails/random_good/letter12.png		
+highlightdisk/screenshot_emails/random_good/letter13.png	highlightdisk/screenshot_emails/tf_idf_custom/letter13.png		
+highlightdisk/screenshot_emails/tf_idf_custom/letter13.png	highlightdisk/screenshot_emails/random_good/letter13.png		
+highlightdisk/screenshot_emails/random_good/letter14.png	highlightdisk/screenshot_emails/tf_idf_custom/letter14.png		
+highlightdisk/screenshot_emails/tf_idf_custom/letter14.png	highlightdisk/screenshot_emails/random_good/letter14.png		
+highlightdisk/screenshot_emails/random_good/letter15.png	highlightdisk/screenshot_emails/tf_idf_custom/letter15.png		
+highlightdisk/screenshot_emails/tf_idf_custom/letter15.png	highlightdisk/screenshot_emails/random_good/letter15.png		
+highlightdisk/screenshot_emails/random_good/letter16.png	highlightdisk/screenshot_emails/tf_idf_custom/letter16.png		
+highlightdisk/screenshot_emails/tf_idf_custom/letter16.png	highlightdisk/screenshot_emails/random_good/letter16.png		
+highlightdisk/screenshot_emails/random_good/letter17.png	highlightdisk/screenshot_emails/tf_idf_custom/letter17.png		
+highlightdisk/screenshot_emails/tf_idf_custom/letter17.png	highlightdisk/screenshot_emails/random_good/letter17.png		
+highlightdisk/screenshot_emails/random_good/letter18.png	highlightdisk/screenshot_emails/tf_idf_custom/letter18.png		
+highlightdisk/screenshot_emails/tf_idf_custom/letter18.png	highlightdisk/screenshot_emails/random_good/letter18.png		
+highlightdisk/screenshot_emails/random_good/letter19.png	highlightdisk/screenshot_emails/tf_idf_custom/letter19.png		
+highlightdisk/screenshot_emails/tf_idf_custom/letter19.png	highlightdisk/screenshot_emails/random_good/letter19.png		
+highlightdisk/screenshot_emails/random_good/letter2.png	highlightdisk/screenshot_emails/tf_idf_custom/letter2.png		
+highlightdisk/screenshot_emails/tf_idf_custom/letter2.png	highlightdisk/screenshot_emails/random_good/letter2.png		
+highlightdisk/screenshot_emails/random_good/letter20.png	highlightdisk/screenshot_emails/tf_idf_custom/letter20.png		
+highlightdisk/screenshot_emails/tf_idf_custom/letter20.png	highlightdisk/screenshot_emails/random_good/letter20.png		
+highlightdisk/screenshot_emails/random_good/letter3.png	highlightdisk/screenshot_emails/tf_idf_custom/letter3.png		
+highlightdisk/screenshot_emails/tf_idf_custom/letter3.png	highlightdisk/screenshot_emails/random_good/letter3.png		
+highlightdisk/screenshot_emails/random_good/letter4.png	highlightdisk/screenshot_emails/tf_idf_custom/letter4.png		
+highlightdisk/screenshot_emails/tf_idf_custom/letter4.png	highlightdisk/screenshot_emails/random_good/letter4.png		
+highlightdisk/screenshot_emails/random_good/letter5.png	highlightdisk/screenshot_emails/tf_idf_custom/letter5.png		
+highlightdisk/screenshot_emails/tf_idf_custom/letter5.png	highlightdisk/screenshot_emails/random_good/letter5.png		
+highlightdisk/screenshot_emails/random_good/letter6.png	highlightdisk/screenshot_emails/tf_idf_custom/letter6.png		
+highlightdisk/screenshot_emails/tf_idf_custom/letter6.png	highlightdisk/screenshot_emails/random_good/letter6.png		
+highlightdisk/screenshot_emails/random_good/letter7.png	highlightdisk/screenshot_emails/tf_idf_custom/letter7.png		
+highlightdisk/screenshot_emails/tf_idf_custom/letter7.png	highlightdisk/screenshot_emails/random_good/letter7.png		
+highlightdisk/screenshot_emails/random_good/letter8.png	highlightdisk/screenshot_emails/tf_idf_custom/letter8.png		
+highlightdisk/screenshot_emails/tf_idf_custom/letter8.png	highlightdisk/screenshot_emails/random_good/letter8.png		
+highlightdisk/screenshot_emails/random_good/letter9.png	highlightdisk/screenshot_emails/tf_idf_custom/letter9.png		
+highlightdisk/screenshot_emails/tf_idf_custom/letter9.png	highlightdisk/screenshot_emails/random_good/letter9.png		
+highlightdisk/screenshot_emails/random/letter13.png	highlightdisk/screenshot_emails/tf_idf_custom/letter13.png	right	
+highlightdisk/screenshot_emails/random/letter14.png	highlightdisk/screenshot_emails/gensim_keywords/letter14.png	right	
+highlightdisk/screenshot_emails/gensim_sentences/letter12.png	highlightdisk/screenshot_emails/random/letter12.png	left	
+highlightdisk/screenshot_emails/random/letter9.png	highlightdisk/screenshot_emails/gensim_sentences/letter9.png	right	
+highlightdisk/screenshot_emails/random/letter16.png	highlightdisk/screenshot_emails/tf_idf_custom/letter16.png	right	
+highlightdisk/screenshot_emails/random/letter1.png	highlightdisk/screenshot_emails/gensim_sentences/letter1.png	right	
+highlightdisk/screenshot_emails/gensim_sentences/letter10.png	highlightdisk/screenshot_emails/random/letter10.png	left	
+highlightdisk/screenshot_emails/random/letter3.png	highlightdisk/screenshot_emails/gensim_keywords/letter3.png	right	
+highlightdisk/screenshot_emails/random/letter6.png	highlightdisk/screenshot_emails/tf_idf_embeddings/letter6.png	right	
+highlightdisk/screenshot_emails/random/letter4.png	highlightdisk/screenshot_emails/gensim_sentences/letter4.png	right	

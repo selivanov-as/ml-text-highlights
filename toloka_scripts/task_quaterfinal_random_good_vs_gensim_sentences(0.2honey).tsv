@@ -1,0 +1,51 @@
+INPUT:image_left	INPUT:image_right	GOLDEN:result	HINT:text
+highlightdisk/screenshot_emails/random_good/letter1.png	highlightdisk/screenshot_emails/gensim_sentences/letter1.png		
+highlightdisk/screenshot_emails/gensim_sentences/letter1.png	highlightdisk/screenshot_emails/random_good/letter1.png		
+highlightdisk/screenshot_emails/random_good/letter10.png	highlightdisk/screenshot_emails/gensim_sentences/letter10.png		
+highlightdisk/screenshot_emails/gensim_sentences/letter10.png	highlightdisk/screenshot_emails/random_good/letter10.png		
+highlightdisk/screenshot_emails/random_good/letter11.png	highlightdisk/screenshot_emails/gensim_sentences/letter11.png		
+highlightdisk/screenshot_emails/gensim_sentences/letter11.png	highlightdisk/screenshot_emails/random_good/letter11.png		
+highlightdisk/screenshot_emails/random_good/letter12.png	highlightdisk/screenshot_emails/gensim_sentences/letter12.png		
+highlightdisk/screenshot_emails/gensim_sentences/letter12.png	highlightdisk/screenshot_emails/random_good/letter12.png		
+highlightdisk/screenshot_emails/random_good/letter13.png	highlightdisk/screenshot_emails/gensim_sentences/letter13.png		
+highlightdisk/screenshot_emails/gensim_sentences/letter13.png	highlightdisk/screenshot_emails/random_good/letter13.png		
+highlightdisk/screenshot_emails/random_good/letter14.png	highlightdisk/screenshot_emails/gensim_sentences/letter14.png		
+highlightdisk/screenshot_emails/gensim_sentences/letter14.png	highlightdisk/screenshot_emails/random_good/letter14.png		
+highlightdisk/screenshot_emails/random_good/letter15.png	highlightdisk/screenshot_emails/gensim_sentences/letter15.png		
+highlightdisk/screenshot_emails/gensim_sentences/letter15.png	highlightdisk/screenshot_emails/random_good/letter15.png		
+highlightdisk/screenshot_emails/random_good/letter16.png	highlightdisk/screenshot_emails/gensim_sentences/letter16.png		
+highlightdisk/screenshot_emails/gensim_sentences/letter16.png	highlightdisk/screenshot_emails/random_good/letter16.png		
+highlightdisk/screenshot_emails/random_good/letter17.png	highlightdisk/screenshot_emails/gensim_sentences/letter17.png		
+highlightdisk/screenshot_emails/gensim_sentences/letter17.png	highlightdisk/screenshot_emails/random_good/letter17.png		
+highlightdisk/screenshot_emails/random_good/letter18.png	highlightdisk/screenshot_emails/gensim_sentences/letter18.png		
+highlightdisk/screenshot_emails/gensim_sentences/letter18.png	highlightdisk/screenshot_emails/random_good/letter18.png		
+highlightdisk/screenshot_emails/random_good/letter19.png	highlightdisk/screenshot_emails/gensim_sentences/letter19.png		
+highlightdisk/screenshot_emails/gensim_sentences/letter19.png	highlightdisk/screenshot_emails/random_good/letter19.png		
+highlightdisk/screenshot_emails/random_good/letter2.png	highlightdisk/screenshot_emails/gensim_sentences/letter2.png		
+highlightdisk/screenshot_emails/gensim_sentences/letter2.png	highlightdisk/screenshot_emails/random_good/letter2.png		
+highlightdisk/screenshot_emails/random_good/letter20.png	highlightdisk/screenshot_emails/gensim_sentences/letter20.png		
+highlightdisk/screenshot_emails/gensim_sentences/letter20.png	highlightdisk/screenshot_emails/random_good/letter20.png		
+highlightdisk/screenshot_emails/random_good/letter3.png	highlightdisk/screenshot_emails/gensim_sentences/letter3.png		
+highlightdisk/screenshot_emails/gensim_sentences/letter3.png	highlightdisk/screenshot_emails/random_good/letter3.png		
+highlightdisk/screenshot_emails/random_good/letter4.png	highlightdisk/screenshot_emails/gensim_sentences/letter4.png		
+highlightdisk/screenshot_emails/gensim_sentences/letter4.png	highlightdisk/screenshot_emails/random_good/letter4.png		
+highlightdisk/screenshot_emails/random_good/letter5.png	highlightdisk/screenshot_emails/gensim_sentences/letter5.png		
+highlightdisk/screenshot_emails/gensim_sentences/letter5.png	highlightdisk/screenshot_emails/random_good/letter5.png		
+highlightdisk/screenshot_emails/random_good/letter6.png	highlightdisk/screenshot_emails/gensim_sentences/letter6.png		
+highlightdisk/screenshot_emails/gensim_sentences/letter6.png	highlightdisk/screenshot_emails/random_good/letter6.png		
+highlightdisk/screenshot_emails/random_good/letter7.png	highlightdisk/screenshot_emails/gensim_sentences/letter7.png		
+highlightdisk/screenshot_emails/gensim_sentences/letter7.png	highlightdisk/screenshot_emails/random_good/letter7.png		
+highlightdisk/screenshot_emails/random_good/letter8.png	highlightdisk/screenshot_emails/gensim_sentences/letter8.png		
+highlightdisk/screenshot_emails/gensim_sentences/letter8.png	highlightdisk/screenshot_emails/random_good/letter8.png		
+highlightdisk/screenshot_emails/random_good/letter9.png	highlightdisk/screenshot_emails/gensim_sentences/letter9.png		
+highlightdisk/screenshot_emails/gensim_sentences/letter9.png	highlightdisk/screenshot_emails/random_good/letter9.png		
+highlightdisk/screenshot_emails/tf_idf_custom/letter12.png	highlightdisk/screenshot_emails/random/letter12.png	left	
+highlightdisk/screenshot_emails/gensim_keywords/letter13.png	highlightdisk/screenshot_emails/random/letter13.png	left	
+highlightdisk/screenshot_emails/embeddings/letter12.png	highlightdisk/screenshot_emails/random/letter12.png	left	
+highlightdisk/screenshot_emails/random/letter4.png	highlightdisk/screenshot_emails/embeddings/letter4.png	right	
+highlightdisk/screenshot_emails/tf_idf_embeddings/letter17.png	highlightdisk/screenshot_emails/random/letter17.png	left	
+highlightdisk/screenshot_emails/gensim_keywords/letter8.png	highlightdisk/screenshot_emails/random/letter8.png	left	
+highlightdisk/screenshot_emails/random/letter6.png	highlightdisk/screenshot_emails/embeddings/letter6.png	right	
+highlightdisk/screenshot_emails/tf_idf_custom/letter2.png	highlightdisk/screenshot_emails/random/letter2.png	left	
+highlightdisk/screenshot_emails/tf_idf_embeddings/letter19.png	highlightdisk/screenshot_emails/random/letter19.png	left	
+highlightdisk/screenshot_emails/tf_idf_custom/letter17.png	highlightdisk/screenshot_emails/random/letter17.png	left	
