@@ -3,7 +3,6 @@ import string
 import pymorphy2
 import operator
 import logging
-import base64
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
@@ -28,7 +27,7 @@ def input_to_words(input):
 
 def sorted_tfidfs_to_spans(sorted_tfidfs, input):
     n_important = int(len(sorted_tfidfs) * SHARE)
-    important_words = {tf_idf_info['word'] for tf_idf_info in sorted_tfidfs[:n_important]}
+    important_words = {tf_idf_info['word'] for tf_idf_info in sorted_tfidfs[:n_important] + list(filter(lambda x: 'meta' in x, sorted_tfidfs))}
 
     grouped_spans = []
     for node in input:
@@ -58,7 +57,6 @@ def handler(event, context):
         }
 
     body = json.loads(event["body"])
-
     words = input_to_words(body["texts"])
     results = tf_idf_normalized(words)
     sorted_tfidfs = sorted(results, key=lambda word: word['tf_idf'], reverse=True)

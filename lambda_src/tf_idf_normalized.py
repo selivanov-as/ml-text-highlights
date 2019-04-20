@@ -36,10 +36,10 @@ def tf_idf_normalized(words, use_pos_tagging=True):
     highlight_threshold = percentile(included_tf_idf_values_sorted, percent=0.7)
 
     for word in result:
-        if word["tf_idf"] >= highlight_threshold:
+        word["highlight"] = True if word["tf_idf"] >= highlight_threshold else False
+
+        if 'meta' in word and word['meta'] == 'numeric':
             word["highlight"] = True
-        else:
-            word["highlight"] = False
 
     if use_pos_tagging:
         pos_tagging(list(filter(lambda word: word.get("normal_form") is not None, result)))
@@ -59,10 +59,10 @@ def create_tf_idf_info(result, words, normalized_words, included_tf_idf_values):
                 'normal_form': word_in_normal_form,
                 'tf': normalized_words.count(word_in_normal_form),
                 'doc_length': doc_length,
-                'idf': word_normal_form_idf
+                'idf': 0,
+                'meta': 'numeric'
             }
             result.append(tf_idf_info)
-
             continue
 
         word_normal_form_idf = normalised_idf.get(word_in_normal_form)
