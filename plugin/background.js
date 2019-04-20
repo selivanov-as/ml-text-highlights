@@ -14,7 +14,6 @@ const notificationOptions = {
 };
 
 chrome.browserAction.onClicked.addListener(function (tab) {
-    console.log('click event')
     const file = "/js/highlight.js";
 
     chrome.tabs.executeScript({file});
@@ -25,8 +24,6 @@ chrome.browserAction.onClicked.addListener(function (tab) {
             "from the extension");
         if (request.method === 'showNotification') {
             const options = notificationOptions[request.options.type];
-            console.log(!!options);
-            console.log(options);
             if (!options) return;
             chrome.notifications.create(options);
         }
