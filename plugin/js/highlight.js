@@ -1,11 +1,12 @@
 var server_addr = 'http://127.0.0.1:5000/tf-idf';
 var rus_or_dig = /[а-яё0-9]/i;
 var ignored_tags = new Set(["SCRIPT", "STYLE"]);
-var endpoint_resolver_addr = "https://5bs06gpnr4.execute-api.eu-west-1.amazonaws.com/default/endpointResolver";
+var logStorageEndpoint = 'https://j3bjlwczt1.execute-api.eu-west-1.amazonaws.com/default/logStorage';
+var endpointResolver = 'https://j3bjlwczt1.execute-api.eu-west-1.amazonaws.com/default/endpointResolver';
 
 async function getEndpoint() {
     try {
-        const response = await axios.get(endpoint_resolver_addr);
+        const response = await axios.get(endpointResolver);
 
         return response.data;
     } catch (e) {
@@ -105,6 +106,10 @@ var inverval = setInterval(() => {
 }, 50);
 
 main(requestStatus, inverval).catch(error => {
-    // ToDo: store error somewhere
+    axios.post(
+        logStorageEndpoint,
+        JSON.stringify({error}),
+        {headers: {'Content-Type': 'application/json'}}
+    );
     chrome.runtime.sendMessage({method: 'showNotification', options: {type: 'error'}});
 });

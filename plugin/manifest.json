@@ -17,7 +17,7 @@
   "browser_action": {},
   "content_scripts": [
     {
-      "js": ["./vendors/mark.min.js", "./vendors/axios.min.js", "./js/highlight.js"],
+      "js": ["./vendors/mark.min.js", "./vendors/axios.min.js"],
       "matches": ["<all_urls>"]
     }
   ]
