@@ -6,7 +6,8 @@
   "permissions": [
     "activeTab",
     "https://*/",
-    "http://*/"
+    "http://*/",
+    "notifications"
   ],
   "background": {
     "scripts": [
@@ -16,11 +17,7 @@
   "browser_action": {},
   "content_scripts": [
     {
-      "js": ["./vendors/mark.min.js"],
-      "matches": ["<all_urls>"]
-    },
-    {
-      "js": ["./vendors/axios.min.js"],
+      "js": ["./vendors/mark.min.js", "./vendors/axios.min.js", "./js/highlight.js"],
       "matches": ["<all_urls>"]
     }
   ]
