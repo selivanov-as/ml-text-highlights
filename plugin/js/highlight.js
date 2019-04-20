@@ -13,7 +13,7 @@ async function getEndpoint() {
     }
 }
 
-function dfs (node, text_nodes) {
+function dfs(node, text_nodes) {
     for (let child = node.firstChild; child; child = child.nextSibling) {
         if (child.nodeName === '#text') {
             text_nodes.push(child);
@@ -22,8 +22,8 @@ function dfs (node, text_nodes) {
     }
 }
 
-function parseTextNodes () {
-    const [text_nodes, texts, good_nodes] = [ [], [], [] ];
+function parseTextNodes() {
+    const [text_nodes, texts, good_nodes] = [[], [], []];
     dfs(document.body, text_nodes);
 
     for (node of text_nodes) {
@@ -40,10 +40,10 @@ function parseTextNodes () {
         });
     }
 
-    return { texts, text_nodes, good_nodes }
+    return {texts, text_nodes, good_nodes}
 }
 
-function parseResponseAndHighlight (spans, { texts, good_nodes }) {
+function parseResponseAndHighlight(spans, {texts, good_nodes}) {
     for (let i = 0; i < good_nodes.length; i++) {
         let node = good_nodes[i];
         let parent = node.parentNode;
@@ -80,19 +80,31 @@ function parseResponseAndHighlight (spans, { texts, good_nodes }) {
     }
 }
 
-async function main () {
+async function main(requestStatus, interval) {
     const endpoint = await getEndpoint();
-    const { texts, text_nodes, good_nodes } = parseTextNodes();
+    const {texts, text_nodes, good_nodes} = parseTextNodes();
 
+    requestStatus.startedAt = Date.now();
     const response = await axios.post(endpoint,
-        JSON.stringify({ texts }),
-        { headers: { 'Content-Type': 'application/json' } }
+        JSON.stringify({texts}),
+        {headers: {'Content-Type': 'application/json'}}
     );
+    requestStatus.isFulfilled = true;
+    clearInterval(inverval);
 
-    parseResponseAndHighlight(response.data, { texts, good_nodes, text_nodes });
+    parseResponseAndHighlight(response.data, {texts, good_nodes, text_nodes});
 }
 
-main().catch(error => {
-    // ToDo: send error message to host here
-    console.log(error);
+var requestStatus = {isFulfilled: false, startedAt: null, notified: false};
+var inverval = setInterval(() => {
+    if (!requestStatus.startedAt) return;
+    if (Date.now() - requestStatus.startedAt >= 5000 && !requestStatus.isFulfilled && !requestStatus.notified) {
+        chrome.runtime.sendMessage({method: 'showNotification', options: {type: 'time'}});
+        requestStatus.notified = true;
+    }
+}, 50);
+
+main(requestStatus, inverval).catch(error => {
+    // ToDo: store error somewhere
+    chrome.runtime.sendMessage({method: 'showNotification', options: {type: 'error'}});
 });
