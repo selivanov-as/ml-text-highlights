@@ -1,8 +1,8 @@
+import itertools
+import json
+import re
 import string
 import pymorphy2
-import json
-import itertools
-import base64
 
 morph = pymorphy2.MorphAnalyzer()
 
@@ -34,7 +34,7 @@ def tokenize_lemmatize_input(inp, lem='pymorphy'):
                            for token in text.split())
                           if word]
             cur_normalized_tokens = [
-                morph.parse(word)[0].normal_form or no_normal
+                morph.parse(word)[0].normal_form or word or no_normal
                 for word in cur_tokens]
             tokens.append(cur_tokens)
             normalized_tokens.append(cur_normalized_tokens)
@@ -46,7 +46,8 @@ def tokenize_lemmatize_input(inp, lem='pymorphy'):
 def important_words_to_spans(important_words, input,
                              grouped_words, spaces_skipped=True,
                              use_normalised=False, grouped_norm_words=None,
-                             important_norm_words=None):
+                             important_norm_words=None,
+                             highlight_numeric=True):
     """
     :param important_words: flat set of important (not normalized) words
     :param input: server input in unified format
@@ -62,6 +63,7 @@ def important_words_to_spans(important_words, input,
     span is a tuple (begin_ind, end_ind) -- halfopen interval of a highlight
     """
     grouped_spans = []
+    numeric_regexp = re.compile('\w*\d+\w*')
     for i, (node, words) in enumerate(zip(input, grouped_words)):
         cur_pos = 0
         text = node['text']
@@ -71,6 +73,7 @@ def important_words_to_spans(important_words, input,
                     (use_normalised
                      and grouped_norm_words[i][j] in important_norm_words)
                     or (not use_normalised and word in important_words)
+                    or (highlight_numeric and re.match(numeric_regexp, word))
             ):
                 beg = text.find(word, cur_pos)
                 cur_pos = end = beg + len(word)
@@ -137,7 +140,8 @@ def handler(event, context):
             important_tokens, inp, tokens,
             spaces_skipped=(LEMMR == 'pymorphy'),
             use_normalised=True, grouped_norm_words=normalized_tokens,
-            important_norm_words=important_normalized_tokens)
+            important_norm_words=important_normalized_tokens,
+            highlight_numeric=True)
 
     return {
         'statusCode': 200,
