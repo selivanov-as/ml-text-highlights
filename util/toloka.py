@@ -126,7 +126,7 @@ def make_df(args):
             cur_vals['task_id'] = task['id']
             del cur_vals['id']
             for opt_key in ['overlap', 'submitted', 'expired',
-                            'public_comment', 'accepted']:
+                            'public_comment', 'accepted', 'skipped']:
                 cur_vals[opt_key] = cur_vals.get(opt_key, np.nan)
             cur_vals['solution'] = solution['output_values']['result'] if solution else np.nan
             cur_vals.update(common)
