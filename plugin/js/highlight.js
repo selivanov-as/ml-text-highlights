@@ -99,7 +99,7 @@ async function main(requestStatus, interval) {
 var requestStatus = {isFulfilled: false, startedAt: null, notified: false};
 var inverval = setInterval(() => {
     if (!requestStatus.startedAt) return;
-    if (Date.now() - requestStatus.startedAt >= 5000 && !requestStatus.isFulfilled && !requestStatus.notified) {
+    if (Date.now() - requestStatus.startedAt >= 1000 && !requestStatus.isFulfilled && !requestStatus.notified) {
         chrome.runtime.sendMessage({method: 'showNotification', options: {type: 'time'}});
         requestStatus.notified = true;
     }
