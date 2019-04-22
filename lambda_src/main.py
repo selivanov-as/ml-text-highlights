@@ -4,7 +4,7 @@ import string
 
 PUNCTUATION = string.punctuation + "–—‒"
 
-SHARE = 0.1
+SHARE = 0.2
 
 
 def input_to_words(input):
