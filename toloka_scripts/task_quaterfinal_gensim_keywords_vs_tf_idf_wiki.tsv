@@ -1,0 +1,51 @@
+INPUT:image_left	INPUT:image_right	GOLDEN:result	HINT:text
+highlightdisk/screenshot_emails/gensim_keywords/letter1.png	highlightdisk/screenshot_emails/tf_idf_wiki/letter1.png		
+highlightdisk/screenshot_emails/tf_idf_wiki/letter1.png	highlightdisk/screenshot_emails/gensim_keywords/letter1.png		
+highlightdisk/screenshot_emails/gensim_keywords/letter10.png	highlightdisk/screenshot_emails/tf_idf_wiki/letter10.png		
+highlightdisk/screenshot_emails/tf_idf_wiki/letter10.png	highlightdisk/screenshot_emails/gensim_keywords/letter10.png		
+highlightdisk/screenshot_emails/gensim_keywords/letter11.png	highlightdisk/screenshot_emails/tf_idf_wiki/letter11.png		
+highlightdisk/screenshot_emails/tf_idf_wiki/letter11.png	highlightdisk/screenshot_emails/gensim_keywords/letter11.png		
+highlightdisk/screenshot_emails/gensim_keywords/letter12.png	highlightdisk/screenshot_emails/tf_idf_wiki/letter12.png		
+highlightdisk/screenshot_emails/tf_idf_wiki/letter12.png	highlightdisk/screenshot_emails/gensim_keywords/letter12.png		
+highlightdisk/screenshot_emails/gensim_keywords/letter13.png	highlightdisk/screenshot_emails/tf_idf_wiki/letter13.png		
+highlightdisk/screenshot_emails/tf_idf_wiki/letter13.png	highlightdisk/screenshot_emails/gensim_keywords/letter13.png		
+highlightdisk/screenshot_emails/gensim_keywords/letter14.png	highlightdisk/screenshot_emails/tf_idf_wiki/letter14.png		
+highlightdisk/screenshot_emails/tf_idf_wiki/letter14.png	highlightdisk/screenshot_emails/gensim_keywords/letter14.png		
+highlightdisk/screenshot_emails/gensim_keywords/letter15.png	highlightdisk/screenshot_emails/tf_idf_wiki/letter15.png		
+highlightdisk/screenshot_emails/tf_idf_wiki/letter15.png	highlightdisk/screenshot_emails/gensim_keywords/letter15.png		
+highlightdisk/screenshot_emails/gensim_keywords/letter16.png	highlightdisk/screenshot_emails/tf_idf_wiki/letter16.png		
+highlightdisk/screenshot_emails/tf_idf_wiki/letter16.png	highlightdisk/screenshot_emails/gensim_keywords/letter16.png		
+highlightdisk/screenshot_emails/gensim_keywords/letter17.png	highlightdisk/screenshot_emails/tf_idf_wiki/letter17.png		
+highlightdisk/screenshot_emails/tf_idf_wiki/letter17.png	highlightdisk/screenshot_emails/gensim_keywords/letter17.png		
+highlightdisk/screenshot_emails/gensim_keywords/letter18.png	highlightdisk/screenshot_emails/tf_idf_wiki/letter18.png		
+highlightdisk/screenshot_emails/tf_idf_wiki/letter18.png	highlightdisk/screenshot_emails/gensim_keywords/letter18.png		
+highlightdisk/screenshot_emails/gensim_keywords/letter19.png	highlightdisk/screenshot_emails/tf_idf_wiki/letter19.png		
+highlightdisk/screenshot_emails/tf_idf_wiki/letter19.png	highlightdisk/screenshot_emails/gensim_keywords/letter19.png		
+highlightdisk/screenshot_emails/gensim_keywords/letter2.png	highlightdisk/screenshot_emails/tf_idf_wiki/letter2.png		
+highlightdisk/screenshot_emails/tf_idf_wiki/letter2.png	highlightdisk/screenshot_emails/gensim_keywords/letter2.png		
+highlightdisk/screenshot_emails/gensim_keywords/letter20.png	highlightdisk/screenshot_emails/tf_idf_wiki/letter20.png		
+highlightdisk/screenshot_emails/tf_idf_wiki/letter20.png	highlightdisk/screenshot_emails/gensim_keywords/letter20.png		
+highlightdisk/screenshot_emails/gensim_keywords/letter3.png	highlightdisk/screenshot_emails/tf_idf_wiki/letter3.png		
+highlightdisk/screenshot_emails/tf_idf_wiki/letter3.png	highlightdisk/screenshot_emails/gensim_keywords/letter3.png		
+highlightdisk/screenshot_emails/gensim_keywords/letter4.png	highlightdisk/screenshot_emails/tf_idf_wiki/letter4.png		
+highlightdisk/screenshot_emails/tf_idf_wiki/letter4.png	highlightdisk/screenshot_emails/gensim_keywords/letter4.png		
+highlightdisk/screenshot_emails/gensim_keywords/letter5.png	highlightdisk/screenshot_emails/tf_idf_wiki/letter5.png		
+highlightdisk/screenshot_emails/tf_idf_wiki/letter5.png	highlightdisk/screenshot_emails/gensim_keywords/letter5.png		
+highlightdisk/screenshot_emails/gensim_keywords/letter6.png	highlightdisk/screenshot_emails/tf_idf_wiki/letter6.png		
+highlightdisk/screenshot_emails/tf_idf_wiki/letter6.png	highlightdisk/screenshot_emails/gensim_keywords/letter6.png		
+highlightdisk/screenshot_emails/gensim_keywords/letter7.png	highlightdisk/screenshot_emails/tf_idf_wiki/letter7.png		
+highlightdisk/screenshot_emails/tf_idf_wiki/letter7.png	highlightdisk/screenshot_emails/gensim_keywords/letter7.png		
+highlightdisk/screenshot_emails/gensim_keywords/letter8.png	highlightdisk/screenshot_emails/tf_idf_wiki/letter8.png		
+highlightdisk/screenshot_emails/tf_idf_wiki/letter8.png	highlightdisk/screenshot_emails/gensim_keywords/letter8.png		
+highlightdisk/screenshot_emails/gensim_keywords/letter9.png	highlightdisk/screenshot_emails/tf_idf_wiki/letter9.png		
+highlightdisk/screenshot_emails/tf_idf_wiki/letter9.png	highlightdisk/screenshot_emails/gensim_keywords/letter9.png		
+highlightdisk/screenshot_emails/random/letter14.png	highlightdisk/screenshot_emails/embeddings/letter14.png	right	
+highlightdisk/screenshot_emails/random/letter11.png	highlightdisk/screenshot_emails/tf_idf_embeddings/letter11.png	right	
+highlightdisk/screenshot_emails/random/letter12.png	highlightdisk/screenshot_emails/tf_idf_custom/letter12.png	right	
+highlightdisk/screenshot_emails/random/letter20.png	highlightdisk/screenshot_emails/tf_idf_custom/letter20.png	right	
+highlightdisk/screenshot_emails/tf_idf_embeddings/letter6.png	highlightdisk/screenshot_emails/random/letter6.png	left	
+highlightdisk/screenshot_emails/embeddings/letter11.png	highlightdisk/screenshot_emails/random/letter11.png	left	
+highlightdisk/screenshot_emails/random/letter1.png	highlightdisk/screenshot_emails/tf_idf_custom/letter1.png	right	
+highlightdisk/screenshot_emails/embeddings/letter4.png	highlightdisk/screenshot_emails/random/letter4.png	left	
+highlightdisk/screenshot_emails/random/letter8.png	highlightdisk/screenshot_emails/tf_idf_embeddings/letter8.png	right	
+highlightdisk/screenshot_emails/tf_idf_custom/letter11.png	highlightdisk/screenshot_emails/random/letter11.png	left	

@@ -4,10 +4,10 @@ import os
 screenshots_folder = '../screenshot_emails/'
 prefix = 'highlightdisk/screenshot_emails/'  # proxy and folder in yadisk
 files = os.listdir(screenshots_folder + 'random')
-pairs = [('random_good', 'tf_idf_custom')] #, ('tf_idf_embeddings', 'gensim_sentences'), 'gensim_keywords', 'embeddings']
+pairs = [('sumy_lsa', 'tf_idf_embeddings')] #, ('tf_idf_embeddings', 'gensim_sentences'), 'gensim_keywords', 'embeddings']
 
-honeypot_algs = ['embeddings', 'gensim_sentences',
-        'tf_idf_embeddings', 'tf_idf_custom', 'gensim_keywords']
+honeypot_algs = ['embeddings', 'tf_idf_embeddings',
+                 'tf_idf_custom']
 honeypot_final_share = 0.2
 n_real_tasks = len(pairs) * len(files) * 2
 honeypot_files = random.choices(files, k=round(
