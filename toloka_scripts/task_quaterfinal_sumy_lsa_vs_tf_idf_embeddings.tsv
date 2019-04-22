@@ -1,0 +1,51 @@
+INPUT:image_left	INPUT:image_right	GOLDEN:result	HINT:text
+highlightdisk/screenshot_emails/sumy_lsa/letter1.png	highlightdisk/screenshot_emails/tf_idf_embeddings/letter1.png		
+highlightdisk/screenshot_emails/tf_idf_embeddings/letter1.png	highlightdisk/screenshot_emails/sumy_lsa/letter1.png		
+highlightdisk/screenshot_emails/sumy_lsa/letter10.png	highlightdisk/screenshot_emails/tf_idf_embeddings/letter10.png		
+highlightdisk/screenshot_emails/tf_idf_embeddings/letter10.png	highlightdisk/screenshot_emails/sumy_lsa/letter10.png		
+highlightdisk/screenshot_emails/sumy_lsa/letter11.png	highlightdisk/screenshot_emails/tf_idf_embeddings/letter11.png		
+highlightdisk/screenshot_emails/tf_idf_embeddings/letter11.png	highlightdisk/screenshot_emails/sumy_lsa/letter11.png		
+highlightdisk/screenshot_emails/sumy_lsa/letter12.png	highlightdisk/screenshot_emails/tf_idf_embeddings/letter12.png		
+highlightdisk/screenshot_emails/tf_idf_embeddings/letter12.png	highlightdisk/screenshot_emails/sumy_lsa/letter12.png		
+highlightdisk/screenshot_emails/sumy_lsa/letter13.png	highlightdisk/screenshot_emails/tf_idf_embeddings/letter13.png		
+highlightdisk/screenshot_emails/tf_idf_embeddings/letter13.png	highlightdisk/screenshot_emails/sumy_lsa/letter13.png		
+highlightdisk/screenshot_emails/sumy_lsa/letter14.png	highlightdisk/screenshot_emails/tf_idf_embeddings/letter14.png		
+highlightdisk/screenshot_emails/tf_idf_embeddings/letter14.png	highlightdisk/screenshot_emails/sumy_lsa/letter14.png		
+highlightdisk/screenshot_emails/sumy_lsa/letter15.png	highlightdisk/screenshot_emails/tf_idf_embeddings/letter15.png		
+highlightdisk/screenshot_emails/tf_idf_embeddings/letter15.png	highlightdisk/screenshot_emails/sumy_lsa/letter15.png		
+highlightdisk/screenshot_emails/sumy_lsa/letter16.png	highlightdisk/screenshot_emails/tf_idf_embeddings/letter16.png		
+highlightdisk/screenshot_emails/tf_idf_embeddings/letter16.png	highlightdisk/screenshot_emails/sumy_lsa/letter16.png		
+highlightdisk/screenshot_emails/sumy_lsa/letter17.png	highlightdisk/screenshot_emails/tf_idf_embeddings/letter17.png		
+highlightdisk/screenshot_emails/tf_idf_embeddings/letter17.png	highlightdisk/screenshot_emails/sumy_lsa/letter17.png		
+highlightdisk/screenshot_emails/sumy_lsa/letter18.png	highlightdisk/screenshot_emails/tf_idf_embeddings/letter18.png		
+highlightdisk/screenshot_emails/tf_idf_embeddings/letter18.png	highlightdisk/screenshot_emails/sumy_lsa/letter18.png		
+highlightdisk/screenshot_emails/sumy_lsa/letter19.png	highlightdisk/screenshot_emails/tf_idf_embeddings/letter19.png		
+highlightdisk/screenshot_emails/tf_idf_embeddings/letter19.png	highlightdisk/screenshot_emails/sumy_lsa/letter19.png		
+highlightdisk/screenshot_emails/sumy_lsa/letter2.png	highlightdisk/screenshot_emails/tf_idf_embeddings/letter2.png		
+highlightdisk/screenshot_emails/tf_idf_embeddings/letter2.png	highlightdisk/screenshot_emails/sumy_lsa/letter2.png		
+highlightdisk/screenshot_emails/sumy_lsa/letter20.png	highlightdisk/screenshot_emails/tf_idf_embeddings/letter20.png		
+highlightdisk/screenshot_emails/tf_idf_embeddings/letter20.png	highlightdisk/screenshot_emails/sumy_lsa/letter20.png		
+highlightdisk/screenshot_emails/sumy_lsa/letter3.png	highlightdisk/screenshot_emails/tf_idf_embeddings/letter3.png		
+highlightdisk/screenshot_emails/tf_idf_embeddings/letter3.png	highlightdisk/screenshot_emails/sumy_lsa/letter3.png		
+highlightdisk/screenshot_emails/sumy_lsa/letter4.png	highlightdisk/screenshot_emails/tf_idf_embeddings/letter4.png		
+highlightdisk/screenshot_emails/tf_idf_embeddings/letter4.png	highlightdisk/screenshot_emails/sumy_lsa/letter4.png		
+highlightdisk/screenshot_emails/sumy_lsa/letter5.png	highlightdisk/screenshot_emails/tf_idf_embeddings/letter5.png		
+highlightdisk/screenshot_emails/tf_idf_embeddings/letter5.png	highlightdisk/screenshot_emails/sumy_lsa/letter5.png		
+highlightdisk/screenshot_emails/sumy_lsa/letter6.png	highlightdisk/screenshot_emails/tf_idf_embeddings/letter6.png		
+highlightdisk/screenshot_emails/tf_idf_embeddings/letter6.png	highlightdisk/screenshot_emails/sumy_lsa/letter6.png		
+highlightdisk/screenshot_emails/sumy_lsa/letter7.png	highlightdisk/screenshot_emails/tf_idf_embeddings/letter7.png		
+highlightdisk/screenshot_emails/tf_idf_embeddings/letter7.png	highlightdisk/screenshot_emails/sumy_lsa/letter7.png		
+highlightdisk/screenshot_emails/sumy_lsa/letter8.png	highlightdisk/screenshot_emails/tf_idf_embeddings/letter8.png		
+highlightdisk/screenshot_emails/tf_idf_embeddings/letter8.png	highlightdisk/screenshot_emails/sumy_lsa/letter8.png		
+highlightdisk/screenshot_emails/sumy_lsa/letter9.png	highlightdisk/screenshot_emails/tf_idf_embeddings/letter9.png		
+highlightdisk/screenshot_emails/tf_idf_embeddings/letter9.png	highlightdisk/screenshot_emails/sumy_lsa/letter9.png		
+highlightdisk/screenshot_emails/embeddings/letter13.png	highlightdisk/screenshot_emails/random/letter13.png	left	
+highlightdisk/screenshot_emails/random/letter4.png	highlightdisk/screenshot_emails/tf_idf_embeddings/letter4.png	right	
+highlightdisk/screenshot_emails/tf_idf_embeddings/letter13.png	highlightdisk/screenshot_emails/random/letter13.png	left	
+highlightdisk/screenshot_emails/random/letter6.png	highlightdisk/screenshot_emails/tf_idf_embeddings/letter6.png	right	
+highlightdisk/screenshot_emails/embeddings/letter10.png	highlightdisk/screenshot_emails/random/letter10.png	left	
+highlightdisk/screenshot_emails/tf_idf_embeddings/letter20.png	highlightdisk/screenshot_emails/random/letter20.png	left	
+highlightdisk/screenshot_emails/random/letter17.png	highlightdisk/screenshot_emails/embeddings/letter17.png	right	
+highlightdisk/screenshot_emails/tf_idf_custom/letter2.png	highlightdisk/screenshot_emails/random/letter2.png	left	
+highlightdisk/screenshot_emails/random/letter19.png	highlightdisk/screenshot_emails/embeddings/letter19.png	right	
+highlightdisk/screenshot_emails/tf_idf_custom/letter1.png	highlightdisk/screenshot_emails/random/letter1.png	left	
