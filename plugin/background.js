@@ -10,6 +10,12 @@ const notificationOptions = {
         title: 'Highlighting fails!',
         message: 'Please try again later',
         iconUrl: 'https://image.flaticon.com/icons/svg/1586/1586270.svg'
+    },
+    emailNotFound : {
+        type: 'basic',
+        title: 'Can\'t find email here!',
+        message: 'Processing all web-page instead...',
+        iconUrl: 'https://image.flaticon.com/icons/svg/1586/1586270.svg'
     }
 };
 

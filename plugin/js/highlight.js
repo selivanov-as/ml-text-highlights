@@ -3,6 +3,10 @@ var rus_or_dig = /[а-яё0-9]/i;
 var ignored_tags = new Set(["SCRIPT", "STYLE"]);
 var logStorageEndpoint = 'https://j3bjlwczt1.execute-api.eu-west-1.amazonaws.com/default/logStorage';
 var endpointResolver = 'https://j3bjlwczt1.execute-api.eu-west-1.amazonaws.com/default/endpointResolver';
+var serviceToCSSClassMap = {
+    'yandex' : 'ns-view-message-body',
+    'google' : 'gs'
+};
 
 async function getEndpoint() {
     try {
@@ -23,9 +27,34 @@ function dfs(node, text_nodes) {
     }
 }
 
+function getEmailNode() {
+    function yandexStrategy() {
+        const container = document.getElementsByClassName(serviceToCSSClassMap['yandex']);
+        return container ? container[0] : null
+    }
+
+    function googleStrategy() {
+        try {
+            const outerContainer = document.getElementsByClassName(serviceToCSSClassMap['google']);
+            return outerContainer[0] && outerContainer[0].childNodes[2] ? outerContainer[0].childNodes[2] : null;
+        } catch (e) {
+            console.log(e);
+        }
+    }
+
+    const host = window.location.hostname;
+    if (host.includes('mail') && host.includes('ya')) return yandexStrategy();
+    if (host.includes('mail') && host.includes('google')) return googleStrategy();
+}
+
 function parseTextNodes() {
     const [text_nodes, texts, good_nodes] = [[], [], []];
-    dfs(document.body, text_nodes);
+    let emailNode = getEmailNode();
+    if (!emailNode) {
+        chrome.runtime.sendMessage({method: 'showNotification', options: {type: 'emailNotFound'}});
+        emailNode = document.body;
+    }
+    dfs(emailNode, text_nodes);
 
     for (node of text_nodes) {
         parent = node.parentNode;
