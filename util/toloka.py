@@ -42,7 +42,7 @@ def get_args():
     parser.add_argument(
         '-p', '--path',
         type=str,
-        help='dataframe saving path, default is ./pool_{Pool_ID}_results.csv'
+        help='dataframe saving path, default is ../toloka_results/pool_{Pool_ID}_results.csv'
     )
 
     return parser.parse_args()
@@ -175,7 +175,7 @@ def save_dataframe(args):
     if 'df' not in cache:
         make_df(args)
     df = cache['df']
-    path = args.path or f'pool_{args.Pool_ID}_results.csv'
+    path = args.path or f'../toloka_results/pool_{args.Pool_ID}_results.csv'
     df.to_csv(path)
 
 
