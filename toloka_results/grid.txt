@@ -1,0 +1,18 @@
+'random_good'
+'tf_idf_custom'
+                     \
+                        'tf_idf_custom'
+                        'embeddings'
+                     /                      \
+'embeddings'                                 \
+'gensim_sentences'                            \
+                                                ?
+                                                ?
+'sumy_lsa'                                    /
+'tf_idf_embeddings'                          /
+                     \                      /
+                        'tf_idf_embeddings'
+                        'tf_idf_wiki'
+                     /
+'tf_idf_wiki'
+'gensim_keywords'
