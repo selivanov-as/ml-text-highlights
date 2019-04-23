@@ -7,7 +7,7 @@
 'embeddings'                                 \
 'gensim_sentences'                            \
                                                 'tf_idf_custom'
-                                                'tf_idf_embeddings'
+                                                'tf_idf_embeddings' V
 'sumy_lsa'                                    /
 'tf_idf_embeddings'                          /
                      \                      /

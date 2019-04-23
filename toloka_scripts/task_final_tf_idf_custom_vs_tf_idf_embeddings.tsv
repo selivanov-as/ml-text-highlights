@@ -1,0 +1,51 @@
+INPUT:image_left	INPUT:image_right	GOLDEN:result	HINT:text
+highlightdisk/screenshot_emails/tf_idf_custom/letter1.png	highlightdisk/screenshot_emails/tf_idf_embeddings/letter1.png		
+highlightdisk/screenshot_emails/tf_idf_embeddings/letter1.png	highlightdisk/screenshot_emails/tf_idf_custom/letter1.png		
+highlightdisk/screenshot_emails/tf_idf_custom/letter10.png	highlightdisk/screenshot_emails/tf_idf_embeddings/letter10.png		
+highlightdisk/screenshot_emails/tf_idf_embeddings/letter10.png	highlightdisk/screenshot_emails/tf_idf_custom/letter10.png		
+highlightdisk/screenshot_emails/tf_idf_custom/letter11.png	highlightdisk/screenshot_emails/tf_idf_embeddings/letter11.png		
+highlightdisk/screenshot_emails/tf_idf_embeddings/letter11.png	highlightdisk/screenshot_emails/tf_idf_custom/letter11.png		
+highlightdisk/screenshot_emails/tf_idf_custom/letter12.png	highlightdisk/screenshot_emails/tf_idf_embeddings/letter12.png		
+highlightdisk/screenshot_emails/tf_idf_embeddings/letter12.png	highlightdisk/screenshot_emails/tf_idf_custom/letter12.png		
+highlightdisk/screenshot_emails/tf_idf_custom/letter13.png	highlightdisk/screenshot_emails/tf_idf_embeddings/letter13.png		
+highlightdisk/screenshot_emails/tf_idf_embeddings/letter13.png	highlightdisk/screenshot_emails/tf_idf_custom/letter13.png		
+highlightdisk/screenshot_emails/tf_idf_custom/letter14.png	highlightdisk/screenshot_emails/tf_idf_embeddings/letter14.png		
+highlightdisk/screenshot_emails/tf_idf_embeddings/letter14.png	highlightdisk/screenshot_emails/tf_idf_custom/letter14.png		
+highlightdisk/screenshot_emails/tf_idf_custom/letter15.png	highlightdisk/screenshot_emails/tf_idf_embeddings/letter15.png		
+highlightdisk/screenshot_emails/tf_idf_embeddings/letter15.png	highlightdisk/screenshot_emails/tf_idf_custom/letter15.png		
+highlightdisk/screenshot_emails/tf_idf_custom/letter16.png	highlightdisk/screenshot_emails/tf_idf_embeddings/letter16.png		
+highlightdisk/screenshot_emails/tf_idf_embeddings/letter16.png	highlightdisk/screenshot_emails/tf_idf_custom/letter16.png		
+highlightdisk/screenshot_emails/tf_idf_custom/letter17.png	highlightdisk/screenshot_emails/tf_idf_embeddings/letter17.png		
+highlightdisk/screenshot_emails/tf_idf_embeddings/letter17.png	highlightdisk/screenshot_emails/tf_idf_custom/letter17.png		
+highlightdisk/screenshot_emails/tf_idf_custom/letter18.png	highlightdisk/screenshot_emails/tf_idf_embeddings/letter18.png		
+highlightdisk/screenshot_emails/tf_idf_embeddings/letter18.png	highlightdisk/screenshot_emails/tf_idf_custom/letter18.png		
+highlightdisk/screenshot_emails/tf_idf_custom/letter19.png	highlightdisk/screenshot_emails/tf_idf_embeddings/letter19.png		
+highlightdisk/screenshot_emails/tf_idf_embeddings/letter19.png	highlightdisk/screenshot_emails/tf_idf_custom/letter19.png		
+highlightdisk/screenshot_emails/tf_idf_custom/letter2.png	highlightdisk/screenshot_emails/tf_idf_embeddings/letter2.png		
+highlightdisk/screenshot_emails/tf_idf_embeddings/letter2.png	highlightdisk/screenshot_emails/tf_idf_custom/letter2.png		
+highlightdisk/screenshot_emails/tf_idf_custom/letter20.png	highlightdisk/screenshot_emails/tf_idf_embeddings/letter20.png		
+highlightdisk/screenshot_emails/tf_idf_embeddings/letter20.png	highlightdisk/screenshot_emails/tf_idf_custom/letter20.png		
+highlightdisk/screenshot_emails/tf_idf_custom/letter3.png	highlightdisk/screenshot_emails/tf_idf_embeddings/letter3.png		
+highlightdisk/screenshot_emails/tf_idf_embeddings/letter3.png	highlightdisk/screenshot_emails/tf_idf_custom/letter3.png		
+highlightdisk/screenshot_emails/tf_idf_custom/letter4.png	highlightdisk/screenshot_emails/tf_idf_embeddings/letter4.png		
+highlightdisk/screenshot_emails/tf_idf_embeddings/letter4.png	highlightdisk/screenshot_emails/tf_idf_custom/letter4.png		
+highlightdisk/screenshot_emails/tf_idf_custom/letter5.png	highlightdisk/screenshot_emails/tf_idf_embeddings/letter5.png		
+highlightdisk/screenshot_emails/tf_idf_embeddings/letter5.png	highlightdisk/screenshot_emails/tf_idf_custom/letter5.png		
+highlightdisk/screenshot_emails/tf_idf_custom/letter6.png	highlightdisk/screenshot_emails/tf_idf_embeddings/letter6.png		
+highlightdisk/screenshot_emails/tf_idf_embeddings/letter6.png	highlightdisk/screenshot_emails/tf_idf_custom/letter6.png		
+highlightdisk/screenshot_emails/tf_idf_custom/letter7.png	highlightdisk/screenshot_emails/tf_idf_embeddings/letter7.png		
+highlightdisk/screenshot_emails/tf_idf_embeddings/letter7.png	highlightdisk/screenshot_emails/tf_idf_custom/letter7.png		
+highlightdisk/screenshot_emails/tf_idf_custom/letter8.png	highlightdisk/screenshot_emails/tf_idf_embeddings/letter8.png		
+highlightdisk/screenshot_emails/tf_idf_embeddings/letter8.png	highlightdisk/screenshot_emails/tf_idf_custom/letter8.png		
+highlightdisk/screenshot_emails/tf_idf_custom/letter9.png	highlightdisk/screenshot_emails/tf_idf_embeddings/letter9.png		
+highlightdisk/screenshot_emails/tf_idf_embeddings/letter9.png	highlightdisk/screenshot_emails/tf_idf_custom/letter9.png		
+highlightdisk/screenshot_emails/embeddings/letter20.png	highlightdisk/screenshot_emails/random/letter20.png	left	
+highlightdisk/screenshot_emails/random/letter3.png	highlightdisk/screenshot_emails/tf_idf_custom/letter3.png	right	
+highlightdisk/screenshot_emails/embeddings/letter3.png	highlightdisk/screenshot_emails/random/letter3.png	left	
+highlightdisk/screenshot_emails/random/letter17.png	highlightdisk/screenshot_emails/embeddings/letter17.png	right	
+highlightdisk/screenshot_emails/tf_idf_embeddings/letter10.png	highlightdisk/screenshot_emails/random/letter10.png	left	
+highlightdisk/screenshot_emails/tf_idf_custom/letter1.png	highlightdisk/screenshot_emails/random/letter1.png	left	
+highlightdisk/screenshot_emails/random/letter7.png	highlightdisk/screenshot_emails/embeddings/letter7.png	right	
+highlightdisk/screenshot_emails/random/letter9.png	highlightdisk/screenshot_emails/tf_idf_custom/letter9.png	right	
+highlightdisk/screenshot_emails/random/letter17.png	highlightdisk/screenshot_emails/tf_idf_embeddings/letter17.png	right	
+highlightdisk/screenshot_emails/random/letter13.png	highlightdisk/screenshot_emails/embeddings/letter13.png	right	
