@@ -5,7 +5,8 @@ var logStorageEndpoint = 'https://j3bjlwczt1.execute-api.eu-west-1.amazonaws.com
 var endpointResolver = 'https://j3bjlwczt1.execute-api.eu-west-1.amazonaws.com/default/endpointResolver';
 var serviceToCSSClassMap = {
     'yandex' : 'ns-view-message-body',
-    'google' : 'gs'
+    'google' : 'gs',
+    'mail_ru' : 'b-letter__details'
 };
 
 async function getEndpoint() {
@@ -42,9 +43,15 @@ function getEmailNode() {
         }
     }
 
+    function mailRuStrategy() {
+        const container = document.getElementsByClassName(serviceToCSSClassMap['mail_ru']);
+        return container ? container[1] : null
+    }
+
     const host = window.location.hostname;
     if (host.includes('mail') && host.includes('ya')) return yandexStrategy();
     if (host.includes('mail') && host.includes('google')) return googleStrategy();
+    if (host.includes('e') && host.includes('mail')) return mailRuStrategy();
 }
 
 function parseTextNodes() {
