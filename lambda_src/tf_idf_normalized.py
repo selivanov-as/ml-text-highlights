@@ -120,7 +120,8 @@ def pos_tagging(result):
                     noun+many adj:{<NOUN><ADJF>+}
                     verb + noun:{<INFN><NOUN>+}
                     verb + verb:{<INFN><INFN>}
-                    prep + verb/noun:{<PRCL>(<INFN>|<NOUN>)} 
+                    particle + verb/noun/adj:{<PRCL>(<INFN>|<NOUN>|<ADJF>)}
+                    prep + verb/noun/adj:{<PREP>(<INFN>|<NOUN>|<ADJF>)} 
                     verb + prep + verb?:{<INFN><PRCL><INFN>?}
                     conj + verb/verb + conj:{(<INFN><CONJ>)|(<CONJ><INFN>)?}
                """

@@ -27,7 +27,8 @@ def input_to_words(input):
 
 def sorted_tfidfs_to_spans(sorted_tfidfs, input):
     n_important = int(len(sorted_tfidfs) * SHARE)
-    important_words = {tf_idf_info['word'] for tf_idf_info in sorted_tfidfs[:n_important] + list(filter(lambda x: 'meta' in x, sorted_tfidfs))}
+    important_words = {tf_idf_info['word'] for tf_idf_info in \
+                       list(filter(lambda word: 'highlight' in word and word['highlight'] == True, sorted_tfidfs))}
 
     grouped_spans = []
     for node in input:
