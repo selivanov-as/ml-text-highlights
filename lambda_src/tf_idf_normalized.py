@@ -1,6 +1,7 @@
 import pymorphy2
 import json
 import imp
+import re
 import sys
 sys.modules["sqlite"] = imp.new_module("sqlite")
 sys.modules["sqlite3.dbapi2"] = imp.new_module("sqlite.dbapi2")
@@ -18,6 +19,8 @@ for x in stop_words_list:
     stop_words[x.strip()] = True
 
 morph = pymorphy2.MorphAnalyzer()
+
+numeric_regexp = re.compile('\w*\d+\w*')
 
 
 def tf_idf_normalized(words, use_pos_tagging=True):
@@ -51,10 +54,10 @@ def create_tf_idf_info(result, words, normalized_words, included_tf_idf_values):
     included_normal_forms = {}
 
     doc_length = len(normalized_words)
-    for i, word_in_normal_form in enumerate(normalized_words):
-        if (word_in_normal_form.isnumeric()):
+    for word, word_in_normal_form in zip(words, normalized_words):
+        if re.match(numeric_regexp, word):
             tf_idf_info = {
-                'word': words[i],
+                'word': word,
                 'tf_idf': 0,
                 'normal_form': word_in_normal_form,
                 'tf': normalized_words.count(word_in_normal_form),
@@ -73,7 +76,7 @@ def create_tf_idf_info(result, words, normalized_words, included_tf_idf_values):
 
         if not word_is_not_in_stop_words_list:
             tf_idf_info = {
-                'word': words[i],
+                'word': word,
                 'tf_idf': 0,
                 'normal_form': word_in_normal_form,
                 'tf': normalized_words.count(word_in_normal_form),
@@ -83,7 +86,7 @@ def create_tf_idf_info(result, words, normalized_words, included_tf_idf_values):
 
         elif word_normal_form_idf_exist and word_is_not_in_stop_words_list:
             tf_idf_info = {
-                'word': words[i],
+                'word': word,
                 'normal_form': word_in_normal_form,
                 'tf_idf': normalized_words.count(word_in_normal_form) / doc_length * 1000 / word_normal_form_idf,
                 'tf': normalized_words.count(word_in_normal_form),
@@ -93,7 +96,7 @@ def create_tf_idf_info(result, words, normalized_words, included_tf_idf_values):
 
         elif not word_normal_form_idf_exist:
             tf_idf_info = {
-                'word': words[i],
+                'word': word,
                 'tf_idf': 0,
                 'normal_form': word_in_normal_form,
                 'tf': normalized_words.count(word_in_normal_form),

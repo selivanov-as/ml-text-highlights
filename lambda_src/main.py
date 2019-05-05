@@ -59,7 +59,7 @@ def handler(event, context):
 
     body = json.loads(event["body"])
     words = input_to_words(body["texts"])
-    results = tf_idf_normalized(words)
+    results = tf_idf_normalized(words, use_pos_tagging=False)
     sorted_tfidfs = sorted(results, key=lambda word: word['tf_idf'], reverse=True)
 
     return {
