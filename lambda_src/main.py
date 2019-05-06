@@ -13,8 +13,6 @@ morph = pymorphy2.MorphAnalyzer()
 
 PUNCTUATION = string.punctuation + "–—‒"
 
-SHARE = 0.3
-
 
 def input_to_words(input):
     texts = [x['text'] for x in input]
@@ -25,18 +23,22 @@ def input_to_words(input):
             if word]  # should we strip?
 
 
-def sorted_tfidfs_to_spans(sorted_tfidfs, input):
-    n_important = int(len(sorted_tfidfs) * SHARE)
-    important_words = {tf_idf_info['word'] for tf_idf_info in \
-                       list(filter(lambda word: 'highlight' in word and word['highlight'] == True, sorted_tfidfs))}
-
+def worddict_list_to_spans(worddicts, input):
+    worddict_iterator = iter(worddicts)
     grouped_spans = []
     for node in input:
         cur_pos = 0
         text = node['text']
         cur_spans = []
         for word in text.split():
-            if word.strip(PUNCTUATION) in important_words:
+            worddict = {}
+            try:
+                while worddict.get('word') != word.strip(PUNCTUATION):
+                    worddict = next(worddict_iterator)
+            except StopIteration:
+                print("can't find word", word)
+                break
+            if worddict.get('highlight'):
                 beg = text.find(word, cur_pos)
                 cur_pos = end = beg + len(word)
                 cur_spans.append((beg, end))
@@ -59,8 +61,7 @@ def handler(event, context):
 
     body = json.loads(event["body"])
     words = input_to_words(body["texts"])
-    results = tf_idf_normalized(words, use_pos_tagging=False)
-    sorted_tfidfs = sorted(results, key=lambda word: word['tf_idf'], reverse=True)
+    results = tf_idf_normalized(words, use_pos_tagging=True)
 
     return {
         'statusCode': 200,
@@ -68,5 +69,5 @@ def handler(event, context):
                     'Access-Control-Allow-Origin': '*',
                     'Access-Control-Allow-Headers': 'Content-Type'
                     },
-        'body': json.dumps(sorted_tfidfs_to_spans(sorted_tfidfs, body["texts"]))
+        'body': json.dumps(worddict_list_to_spans(results, body["texts"]))
     }
