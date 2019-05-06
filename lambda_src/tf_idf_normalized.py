@@ -139,8 +139,15 @@ def pos_tagging(result):
         # highlight all words in collocation if one of them already was highlighted
         # TODO: Iterate through all elements of subtree (it might be > 2)
         term1, term2 = subtree[0][0], subtree[1][0]
-        tf_idf_info1, tf_idf_info2 = next(x for x in result if x["normal_form"] == term1), \
-                                     next(x for x in result if x["normal_form"] == term2)
+        tf_idf_info1, tf_idf_info2 = None, None
+        for i in range(len(result) - 1):
+            if (result[i]["normal_form"] == term1
+                    and result[i + 1]["normal_form"] == term2):
+                tf_idf_info1, tf_idf_info2 = result[i], result[i + 1]
 
-        if tf_idf_info1["highlight"] or tf_idf_info2["highlight"]:
+        if (
+                tf_idf_info1
+                and tf_idf_info2
+                and (tf_idf_info1["highlight"] or tf_idf_info2["highlight"])
+        ):
             tf_idf_info1["highlight"], tf_idf_info2["highlight"] = True, True
