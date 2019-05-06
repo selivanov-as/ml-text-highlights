@@ -32,8 +32,12 @@ def worddict_list_to_spans(worddicts, input):
         cur_spans = []
         for word in text.split():
             worddict = {}
+            stripped = word.strip(PUNCTUATION)
+            if not stripped:
+                cur_pos += 2
+                continue
             try:
-                while worddict.get('word') != word.strip(PUNCTUATION):
+                while worddict.get('word') != stripped:
                     worddict = next(worddict_iterator)
             except StopIteration:
                 print("can't find word", word)
