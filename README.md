@@ -121,7 +121,7 @@ http://www.machinelearning.ru/wiki/images/7/7e/Mel_lain_msu_nlp_sem_5.pdf
 const params = {
     name: "<Your function name>",
     role: "arn:aws:iam::<Lamda ID>:role/service-role/defaultRole",
-    runtime: "python3.7"
+    runtime: "python3.6"
 };
 
 const options = {

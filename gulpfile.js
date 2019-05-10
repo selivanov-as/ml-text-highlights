@@ -1,20 +1,40 @@
+/**
+ * See README (Настройка окружения) doc for details.
+ * This gulp script requires Docker installed on your host machine
+ */
+
 const gulp = require("gulp");
 const lambda = require("gulp-lambda-deploy");
 const zip = require("gulp-zip");
 const del = require("del");
-const AWS = require("aws-sdk");
-const gutil = require("gulp-util");
+const util = require('util');
+const exec = util.promisify(require('child_process').exec);
 
 const path = {
     lambda_sources: ["./lambda_src/**/*.*"],
     dist_folder: "./dist/",
     zip_dist_file: "dist.zip",
-    pymorphy_lib: "./venv/lib/python3.7/site-packages/pymorphy2/**/*.*",
-    pymorphy_dicts_lib: "./venv/lib/python3.7/site-packages/pymorphy2_dicts/**/*.*",
-    dawg_python_lib: "./venv/lib/python3.7/site-packages/dawg_python/**/*.*",
-    nltk_lib: "./venv/lib/python3.7/site-packages/nltk/**/*.*",
+    dependencies_src: "./venv/lib/python3.6/site-packages/**/*.*",
     dist_sources: "./dist/**/*.*"
 };
+
+
+async function dockerBuild() {
+    // run a command in a shell
+    // requires Docker installed
+    const cmd = 'docker run -it -v $PWD:/var/task lambci/lambda:build-python3.6 bash';
+    const {stdout, stderr} = await exec(cmd);
+    if (stderr) throw new Error(stderr)
+}
+
+async function installRequirements() {
+    // run a command in a shell
+    const [activateCmd, installRequirements] = ["source ./venv/bin/activate", "pip install -r requirements.txt"];
+    const {stdoutActivateCmd, stderrActivateCmd} = await exec(activateCmd);
+    if (stderrActivateCmd) throw new Error(stderr);
+    const {stdoutInstallCmd, stderrInstallCmd} = await exec(installRequirements);
+    if (stderrInstallCmd) throw new Error(stderr)
+}
 
 gulp.task("clean", cb =>
     del('./dist',
@@ -22,33 +42,19 @@ gulp.task("clean", cb =>
     )
 );
 
-gulp.task("pymorphy2", _ =>
-    gulp.src(path.pymorphy_lib)
-        .pipe(gulp.dest(path.dist_folder + "pymorphy2"))
-);
-
-gulp.task("pymorphy2_dicts", _ =>
-    gulp.src(path.pymorphy_dicts_lib)
-        .pipe(gulp.dest(path.dist_folder + "pymorphy2_dicts"))
-);
-
-gulp.task("dawg_python", _ =>
-    gulp.src(path.dawg_python_lib)
-        .pipe(gulp.dest(path.dist_folder + "dawg_python"))
-);
-
-gulp.task("numpy", _ =>
-    gulp.src(path.numpy_lib)
-        .pipe(gulp.dest(path.dist_folder + "numpy"))
-);
-
-gulp.task("nltk", _ =>
-    gulp.src(path.nltk_lib)
-        .pipe(gulp.dest(path.dist_folder + "nltk"))
-);
-
 gulp.task("sources", _ =>
     gulp.src(path.lambda_sources)
+        .pipe(gulp.dest(path.dist_folder))
+);
+
+gulp.task("dependenciesBuild", async (cb) => {
+    await dockerBuild();
+    await installRequirements();
+    return cb()
+});
+
+gulp.task("dependencies", _ =>
+    gulp.src(path.dependencies_src)
         .pipe(gulp.dest(path.dist_folder))
 );
 
@@ -59,9 +65,9 @@ gulp.task("zip", _ =>
 );
 
 const params = {
-    name: "Highlights",
-    role: "arn:aws:iam::701551728765:role/service-role/defaultRole",
-    runtime: "python3.7",
+    name: "<Your function name>",
+    role: "arn:aws:iam::<Lamda ID>:role/service-role/defaultRole",
+    runtime: "python3.6",
     handler: "main.handler"
 };
 
@@ -79,7 +85,8 @@ gulp.task("upload", cb =>
 gulp.task('default',
     gulp.series(
         ["clean"],
-        ["pymorphy2", "dawg_python", "nltk", "pymorphy2_dicts", "sources"],
+        ["dependenciesBuild"],
+        ["dependencies", "sources"],
         ['zip'],
         ['upload'],
         done => done()
