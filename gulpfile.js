@@ -65,7 +65,7 @@ gulp.task("zip", _ =>
 );
 
 const params = {
-    name: "Highlights-tf-idf-pos",
+    name: "Highlights-tf-idf-pos_share0.2",
     role: "arn:aws:iam::632759214929:role/service-role/defaultRole",
     runtime: "python3.6",
     handler: "main.handler"
