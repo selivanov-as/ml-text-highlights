@@ -14,6 +14,8 @@ with open('./normalized_idf.json') as f:
 with open("./stopwords.txt") as f:
     stop_words_list = f.readlines()
 
+SHARE = 0.3
+
 stop_words = {}
 for x in stop_words_list:
     stop_words[x.strip()] = True
@@ -34,9 +36,10 @@ def tf_idf_normalized(words, use_pos_tagging=True):
     # Calculate if-idf values
     create_tf_idf_info(result, words, normalized_words, included_tf_idf_values)
 
-    # Calculate highlight threshold (get first 30% of list)
+    # Calculate highlight threshold (get first SHARE% of list)
     included_tf_idf_values_sorted = sorted(included_tf_idf_values, reverse=True)
-    highlight_threshold = percentile(included_tf_idf_values_sorted, percent=0.7)
+    highlight_threshold = percentile(included_tf_idf_values_sorted,
+                                     percent=(1 - SHARE))
 
     for word in result:
         word["highlight"] = True if word["tf_idf"] >= highlight_threshold else False
