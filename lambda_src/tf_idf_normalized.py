@@ -14,7 +14,7 @@ with open('./normalized_idf.json') as f:
 with open("./stopwords.txt") as f:
     stop_words_list = f.readlines()
 
-SHARE = 0.5
+SHARE = 0.6
 
 stop_words = {}
 for x in stop_words_list:
