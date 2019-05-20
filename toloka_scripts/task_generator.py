@@ -4,7 +4,11 @@ import os
 screenshots_folder = '../screenshot_emails/'
 prefix = 'highlightdisk/screenshot_emails/'  # proxy and folder in yadisk
 files = os.listdir(screenshots_folder + 'random')
-pairs = [('tf_idf_pos_share_04', 'tf_idf_pos_share_05')]  #, ('tf_idf_embeddings', 'gensim_sentences'), 'gensim_keywords', 'embeddings']
+exclude_files = {'letter1.png', 'letter7.png',
+                 'letter10.png','letter14.png',
+                 'letter17.png', 'letter18.png'}  # уберем те которые одинаковые для алгоритмов
+files = [file for file in files if file not in exclude_files]
+pairs = [('tf_idf_pos_share_06', 'tf_idf_pos_share_07')]  #, ('tf_idf_embeddings', 'gensim_sentences'), 'gensim_keywords', 'embeddings']
 
 honeypot_algs = ['tf_idf_embeddings',
                  'tf_idf_custom', 'tf_idf_pos']
@@ -15,7 +19,7 @@ honeypot_files = random.choices(files, k=round(
 ))
 
 
-with open('tf_idf_pos_share_04_vs_tf_idf_pos_share_05.tsv', 'w') as f:
+with open('tf_idf_pos_share_06_vs_tf_idf_pos_share_07.tsv', 'w') as f:
     f.write('INPUT:image_left	INPUT:image_right	GOLDEN:result	HINT:text\n')
     for pair in pairs:
         filelists = [os.listdir(screenshots_folder + alg) for alg in pair]
